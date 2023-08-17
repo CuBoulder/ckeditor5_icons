@@ -1,0 +1,6 @@
+name: CKEditor 5 Icons
+type: module
+description: 'Provides an icon picker interface for CKEditor 5 with access to the full set of Font Awesome Free icons.'
+core_version_requirement: ^9.5 || ^10
+dependencies:
+  - drupal:ckeditor5

@@ -1,0 +1,24 @@
+.ck .ckeditor5-icons__picker-header .ck-dropdown__panel .ck-list {
+	max-height: 256px;
+	overflow-y: auto;
+}
+
+.ck .ckeditor5-icons__picker-footer {
+	align-items: baseline;
+}
+
+.ck .ckeditor5-icons__icon-picker-footer .ckeditor5-icons__fa {
+	font-size: 1.5em;
+}
+
+.ck .ck.ck-icon.ckeditor5-icons__fa {
+	text-align: center;
+}
+
+/* Needed to fix CKEditor overriding Font Awesome styles */
+.ck .ckeditor5-icons__fa.fa-solid, .ck .ckeditor5-icons__fa.fa-regular, .ck .ckeditor5-icons__fa.fa-classic {
+	font-family: 'Font Awesome 6 Free', 'Font Awesome 5 Free';
+}
+.ck .ckeditor5-icons__fa.fa-brands {
+	font-family: 'Font Awesome 6 Brands', 'Font Awesome 5 Brands';
+}
