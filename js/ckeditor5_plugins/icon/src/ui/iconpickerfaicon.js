@@ -28,10 +28,10 @@ export default class IconPickerFAIcon extends View {
 		super(locale);
 
 		this.setTemplate({
-			tag: 'span',
+			tag: 'i',
 			attributes: {
 				class: [
-					'ckeditor5-icons__fa',
+					'ckeditor5-icons__icon',
 					getFAStyleClass(faVersion, getValidIconStyle(iconDefinition, iconStyle)),
 					'fa-' + iconName
 				]

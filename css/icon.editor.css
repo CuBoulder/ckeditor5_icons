@@ -7,24 +7,28 @@
 	align-items: baseline;
 }
 
-.ck .ckeditor5-icons__icon-picker-footer .ckeditor5-icons__fa {
+.ck .ckeditor5-icons__icon-picker-footer .ckeditor5-icons__icon {
 	font-size: 1.5em;
 }
 
-.ck .ck.ck-icon.ckeditor5-icons__fa {
+.ck .ck.ck-icon.ckeditor5-icons__icon {
 	text-align: center;
 }
 
+.ck svg.ckeditor5-icons__icon {
+	height: 1em;
+}
+
 /* Needed to fix CKEditor overriding Font Awesome styles */
-.ck .ckeditor5-icons__fa.fa-solid, .ck .ckeditor5-icons__fa.fa-regular {
-	font-family: 'Font Awesome 6 Free';
+.ck .ckeditor5-icons__icon.fa-solid, .ck .ckeditor5-icons__icon.fa-regular {
+	font-family: 'Font Awesome 6 Free' !important;
 }
-.ck .ckeditor5-icons__fa.fas, .ck .ckeditor5-icons__fa.far {
-	font-family: 'Font Awesome 5 Free';
+.ck .ckeditor5-icons__icon.fas, .ck .ckeditor5-icons__icon.far {
+	font-family: 'Font Awesome 5 Free' !important;
 }
-.ck .ckeditor5-icons__fa.fa-brands {
-	font-family: 'Font Awesome 6 Brands';
+.ck .ckeditor5-icons__icon.fa-brands {
+	font-family: 'Font Awesome 6 Brands' !important;
 }
-.ck .ckeditor5-icons__fa.fab {
-	font-family: 'Font Awesome 5 Brands';
+.ck .ckeditor5-icons__icon.fab {
+	font-family: 'Font Awesome 5 Brands' !important;
 }
