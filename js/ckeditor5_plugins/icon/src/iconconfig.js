@@ -1,6 +1,10 @@
 /**
  * @file defines configuration for the icon plugin.
  * 
+ * @typedef { '5' | '6' } FontAwesomeVersion
+ * @typedef { { 'icons': string[], 'label': string } } CategoryDefinition
+ * @typedef { { 'styles': string[], 'label': string } } IconDefinition
+ * 
  * @typedef {Object} SelectableOption
  * @property {string} label
  * @property {string?} icon
@@ -89,3 +93,24 @@ export const alignmentOptions = {
 };
 
 export const alignmentDefault = 'none';
+
+/**
+ * Provides a definition of FA styles by version.
+ */
+export const faStylesByVersion = {
+	'6': {
+		'solid': 'fa-solid',
+		'regular': 'fa-regular',
+		'light': 'fa-light',
+		'thin': 'fa-thin',
+		'duotone': 'fa-duotone',
+		'brands': 'fa-brands'
+	},
+	'5': {
+		'solid': 'fas',
+		'regular': 'far',
+		'light': 'fal',
+		'duotone': 'fad',
+		'brands': 'fab'
+	}
+};

@@ -1,0 +1,8 @@
+# Plugin \Drupal\ckeditor5_icons\Plugin\CKEditor5Plugin\Icon
+ckeditor5.plugin.ckeditor5_icons_icon:
+  type: mapping
+  label: Icons
+  mapping:
+    fa_version:
+      type: string
+      label: 'Font Awesome library version'

@@ -1,7 +1,8 @@
 /**
  * @file contains the icon picker grid button for FontAwesome icons.
  * 
- * @typedef { import('./iconpicker').IconDefinition } IconDefinition
+ * @typedef { import('../iconconfig').FontAwesomeVersion } FontAwesomeVersion
+ * @typedef { import('../iconconfig').IconDefinition } IconDefinition
  * @typedef { import('@ckeditor/ckeditor5-utils').Locale } Locale
  */
 
@@ -14,15 +15,17 @@ export default class IconPickerItem extends ButtonView {
 	 * 
 	 * @param {Locale} locale 
 	 *   The locale.
+	 * @param {FontAwesomeVersion} faVersion 
+	 *   The version of FontAwesome being used.
 	 * @param {string} iconName 
 	 *   The name of the icon this button is for.
 	 * @param {IconDefinition} iconDefinition 
 	 *   The defintion of the icon this button is for.
 	 */
-	constructor(locale, iconName, iconDefinition) {
+	constructor(locale, faVersion, iconName, iconDefinition) {
 		super(locale);
 
-		this._faIcon = new IconPickerFAIcon(locale, iconName, iconDefinition);
+		this._faIcon = new IconPickerFAIcon(locale, faVersion, iconName, iconDefinition);
 		this._faIcon.extendTemplate({
 			attributes: {
 				class: [

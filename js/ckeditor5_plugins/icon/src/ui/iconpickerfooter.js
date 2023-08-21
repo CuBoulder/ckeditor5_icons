@@ -1,11 +1,13 @@
 /**
  * @file contains the icon picker icon for FontAwesome icons.
  * 
- * @typedef { import('./iconpicker').IconDefinition } IconDefinition
+ * @typedef { import('../iconconfig').FontAwesomeVersion } FontAwesomeVersion
+ * @typedef { import('../iconconfig').IconDefinition } IconDefinition
  * @typedef { import('@types/ckeditor__ckeditor5-utils').Locale } Locale
  */
 
 import { View } from 'ckeditor5/src/ui';
+import { getValidIconStyle } from '../iconutils';
 import IconPickerFAIcon from './iconpickerfaicon';
 import IconPickerForm from './iconpickerform';
 
@@ -22,6 +24,7 @@ export default class IconPickerFooter extends View {
 		const t = locale.t, bind = this.bindTemplate;
 
 		this.set('iconName', null);
+		this.set('iconStyle', 'solid');
 		this.set('iconLabel', 'Select an icon');
 
 		this.items = this.createCollection();
@@ -60,14 +63,19 @@ export default class IconPickerFooter extends View {
 	/**
 	 * Refreshes the icon picker footer when an icon in the grid is selected.
 	 * 
+	 * @param {FontAwesomeVersion} faVersion 
+	 *   The version of FontAwesome being used.
 	 * @param {string?} iconName 
 	 *   The name of the icon.
 	 * @param {IconDefinition?} iconDefinition 
 	 *   The defintion of the icon.
 	 */
-	refresh(iconName, iconDefinition) {
+	refresh(faVersion, iconName, iconDefinition) {
 		this.set('iconName', iconName);
-		this.set('iconLabel', iconDefinition ? iconDefinition.label : 'Select an icon');
+		if (iconDefinition) {
+			this.set('iconStyle', getValidIconStyle(iconDefinition, this.iconStyle));
+			this.set('iconLabel', iconDefinition.label);
+		} else this.set('iconLabel', 'Select an icon');
 
 		const iconPreviewView = this.iconPreviewView;
 		let faIcon = null;
@@ -78,7 +86,7 @@ export default class IconPickerFooter extends View {
 		}
 
 		if (iconName && iconDefinition) {
-			faIcon = new IconPickerFAIcon(this.locale, iconName, iconDefinition);
+			faIcon = new IconPickerFAIcon(this.locale, faVersion, iconName, iconDefinition, this.iconStyle);
 			iconPreviewView.registerChild(faIcon);
 			iconPreviewView.element.appendChild(faIcon.element);
 		}

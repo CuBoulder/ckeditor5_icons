@@ -5,10 +5,6 @@ ckeditor5_icons_icon:
   ckeditor5:
     plugins:
       - icon.Icon
-    config:
-      icon: 
-        faCategories: {}
-        faIcons: {}
   # Configuration that will be used directly by Drupal.
   drupal:
     label: Icons

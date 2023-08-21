@@ -76,7 +76,7 @@ export default class IconEditing extends Plugin {
 	 */
 	_defineConverters() {
 		// Defines the regex for detecting an icon's style.
-		const styleRegex = /fa-(solid|regular|light|thin|duotone|classic|brands)/;
+		const styleRegex = /(fa-(solid|regular|light|thin|duotone|brands))|fas|far|fal|fad|fab/;
 
 		// Converters are registered via the central editor object.
 		const { conversion } = this.editor;
@@ -88,11 +88,10 @@ export default class IconEditing extends Plugin {
 				value: viewElement => {
 					if (!viewElement.hasAttribute('class'))
 						return;
-					const classNames = viewElement.getAttribute('class').match(/(^| )fa-([a-z0-9\-]+)/g);
+					const classNames = viewElement.getAttribute('class').match(/(fa-([a-z0-9\-]+)|fas|far|fal|fad|fab)/g);
 					let iconClass = '';
 					for (let className of classNames) {
-						// Filters out the dedicated attributes.
-						if (!className.match(/fa-(2xs|xs|sm|lg|xl|2xl|([0-9]|10)x)/) && !className.match(/fa-(pull-left|pull-right)/))
+						if (!className.match(/fa-(2xs|xs|sm|lg|xl|2xl|([0-9]|10)x)/) && !className.match(/fa-(pull-left|pull-right)/)) // Filters out the dedicated attributes.
 							iconClass = iconClass ? iconClass + ' ' + className : className;
 					}
 					return iconClass;

@@ -1,8 +1,9 @@
 /**
  * @file contains the icon picker grid view.
  * 
- * @typedef { import('./iconpicker').CategoryDefinition } CategoryDefinition
- * @typedef { import('./iconpicker').IconDefinition } IconDefinition
+ * @typedef { import('../iconconfig').FontAwesomeVersion } FontAwesomeVersion
+ * @typedef { import('../iconconfig').CategoryDefinition } CategoryDefinition
+ * @typedef { import('../iconconfig').IconDefinition } IconDefinition
  * @typedef { import('@ckeditor/ckeditor5-utils').Locale } Locale
  */
 
@@ -66,13 +67,14 @@ export default class IconPickerGrid extends View {
 	}
 
 	/**
+	 * @param {FontAwesomeVersion} faVersion 
 	 * @param {string} iconName 
 	 * @param {IconDefinition} iconDefinition 
 	 * @returns {IconPickerItem}
 	 *   An IconPickerItem created based on the provded icon.
 	 */
-	_createItem(iconName, iconDefinition) {
-		const item = new IconPickerItem(this.locale, iconName, iconDefinition), t = this.locale.t;
+	_createItem(faVersion, iconName, iconDefinition) {
+		const item = new IconPickerItem(this.locale, faVersion, iconName, iconDefinition), t = this.locale.t;
 
 		this.set('iconName', null);
 
@@ -106,15 +108,16 @@ export default class IconPickerGrid extends View {
 	/**
 	 * Refreshes this icon picker grid based on a category selection.
 	 * 
+	 * @param {FontAwesomeVersion} faVersion 
 	 * @param {CategoryDefinition} categoryDefinition 
 	 * @param {Object<string, IconDefinition>} iconDefinitions
 	 */
-	refresh(categoryDefinition, iconDefinitions) {
+	refresh(faVersion, categoryDefinition, iconDefinitions) {
 		this.items.clear();
 		for (const iconName of categoryDefinition.icons) {
 			const iconDefinition = iconDefinitions[iconName];
 			if (iconDefinition)
-				this.items.add(this._createItem(iconName, iconDefinitions[iconName]));
+				this.items.add(this._createItem(faVersion, iconName, iconDefinitions[iconName]));
 		}
 	}
 

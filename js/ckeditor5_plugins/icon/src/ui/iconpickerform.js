@@ -1,7 +1,7 @@
 /**
  * @file contains the icon picker submit form.
  * 
- * @typedef { import('./iconpicker').IconDefinition } IconDefinition
+ * @typedef { import('../iconconfig').IconDefinition } IconDefinition
  * @typedef { import('@ckeditor/ckeditor5-utils').Locale } Locale
  */
 

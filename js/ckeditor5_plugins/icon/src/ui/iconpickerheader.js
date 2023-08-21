@@ -1,7 +1,7 @@
 /**
  * @file contains the icon picker FormHeaderView.
  * 
- * @typedef { import('./iconpicker').CategoryDefinition } CategoryDefinition
+ * @typedef { import('../iconconfig').CategoryDefinition } CategoryDefinition
  * @typedef { import('@ckeditor/ckeditor5-utils').Locale } Locale
  * @typedef { import('@ckeditor/ckeditor5-ui/src/dropdown/dropdownview').default } DropdownView
  * @typedef { import('@ckeditor/ckeditor5-ui/src/dropdown/utils').ListDropdownItemDefinition } ListDropdownItemDefinition
