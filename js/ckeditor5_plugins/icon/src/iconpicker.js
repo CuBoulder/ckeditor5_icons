@@ -1,24 +1,21 @@
 /**
  * @file registers the icon picker and binds functionality to it.
  * 
- * @typedef { import('../iconconfig').FontAwesomeVersion } FontAwesomeVersion
- * @typedef { import('../iconconfig').CategoryDefinition } CategoryDefinition
- * @typedef { import('../iconconfig').IconDefinition } IconDefinition
+ * @typedef { import('./iconconfig').FontAwesomeVersion } FontAwesomeVersion
+ * @typedef { import('./iconconfig').CategoryDefinition } CategoryDefinition
+ * @typedef { import('./iconconfig').IconDefinition } IconDefinition
  * @typedef { import('@types/ckeditor__ckeditor5-utils').Locale } Locale
  * @typedef { import('@types/ckeditor__ckeditor5-core').Command } Command
  * @typedef { import('@types/ckeditor__ckeditor5-ui/src/dropdown/dropdownview').default } DropdownView
  * @typedef { import('@types/ckeditor__ckeditor5-core/src/editor/editorwithui').EditorWithUI } EditorWithUI
- * @typedef { import('../iconconfig').SelectableOption } SelectableOption
+ * @typedef { import('./iconconfig').SelectableOption } SelectableOption
  */
 
 import { createDropdown } from 'ckeditor5/src/ui';
 import { Plugin } from 'ckeditor5/src/core';
-import iconIcon from '../../../../../icons/icon.svg';
-import IconPickerHeader from './iconpickerheader';
-import IconPickerView from './iconpickerview';
-import IconPickerGrid from './iconpickergrid';
-import IconPickerFooter from './iconpickerfooter';
-import { getFAStyleClass } from '../iconutils';
+import iconIcon from '../../../../icons/icon.svg';
+import IconPickerView from './view/iconpickerview';
+import { getFAStyleClass } from './iconutils';
 
 export default class IconPicker extends Plugin {
 	/**
@@ -55,12 +52,10 @@ export default class IconPicker extends Plugin {
 
 			dropdownView.on('change:isOpen', () => {
 				if (!iconPickerView) {
-					iconPickerView = this._createIconPickerView(locale, faVersion, faCategories, faIcons);
-					this.listenTo(iconPickerView, 'execute', eventInfo => {
+					iconPickerView = new IconPickerView(locale, faVersion, faCategories, faIcons);
+					this.listenTo(iconPickerView, 'execute', eventInfo => { // Inserts the icon when the icon picker view fires the `execute` event.
 						const { iconName, iconStyle } = eventInfo.source;
-						command.execute({
-							iconClass: getFAStyleClass(faVersion, iconStyle) + ' fa-' + iconName
-						});
+						command.execute({ iconClass: getFAStyleClass(faVersion, iconStyle) + ' fa-' + iconName });
 					});
 					dropdownView.panelView.children.add(iconPickerView);
 				}
@@ -68,19 +63,5 @@ export default class IconPicker extends Plugin {
 
 			return dropdownView;
 		});
-	}
-
-	_createIconPickerView(locale, faVersion, faCategories, faIcons) {
-		const headerView = new IconPickerHeader(locale, faCategories);
-		const gridView = new IconPickerGrid(locale);
-		const footerView = new IconPickerFooter(locale);
-
-		headerView.on('execute', () => {
-			gridView.refresh(faVersion, faCategories[headerView.categoryDropdownView.value], faIcons);
-			footerView.refresh(faVersion, null);
-		});
-		gridView.on('execute', (eventInfo, iconName) => footerView.refresh(faVersion, iconName, faIcons[iconName]));
-
-		return new IconPickerView(locale, headerView, gridView, footerView);
 	}
 }

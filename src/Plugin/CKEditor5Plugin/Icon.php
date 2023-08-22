@@ -79,6 +79,7 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 		$form['fa_version'] = [
 			'#type' => 'select',
 			'#title' => $this->t('Font Awesome library version'),
+			'#description' => $this->t('The selected version must match the version of the library included on your site.'),
 			'#options' => [
 				'6' => 'Font Awesome 6',
 				'5' => 'Font Awesome 5'

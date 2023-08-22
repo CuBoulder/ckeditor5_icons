@@ -16,13 +16,11 @@ export default class IconPickerGrid extends View {
 	/**
 	 * Creates a new IconPickerGrid.
 	 * 
-	 * @param {Locale} locale 
+	 * @param {Locale} locale
 	 *   The locale.
 	 */
 	constructor(locale) {
 		super(locale);
-
-		this.set('iconName', null);
 
 		this.items = this.createCollection();
 
@@ -67,9 +65,9 @@ export default class IconPickerGrid extends View {
 	}
 
 	/**
-	 * @param {FontAwesomeVersion} faVersion 
-	 * @param {string} iconName 
-	 * @param {IconDefinition} iconDefinition 
+	 * @param {FontAwesomeVersion} faVersion
+	 * @param {string} iconName
+	 * @param {IconDefinition} iconDefinition
 	 * @returns {IconPickerItem}
 	 *   An IconPickerItem created based on the provded icon.
 	 */
@@ -94,12 +92,9 @@ export default class IconPickerGrid extends View {
 			}
 		});
 
-		item.on('mouseover', () => this.fire('itemHover', iconName));
-		item.on('focus', () => this.fire('itemFocus', iconName));
-		item.on('execute', () => {
-			this.set('iconName', iconName);
-			this.fire('execute', iconName);
-		});
+		item.on('mouseover', () => this.fire('itemHover', iconName, iconDefinition));
+		item.on('focus', () => this.fire('itemFocus', iconName, iconDefinition));
+		item.on('execute', () => this.fire('execute', iconName, iconDefinition));
 		item.bind('isOn').to(this, 'iconName', value => iconName === value);
 
 		return item;
@@ -108,13 +103,13 @@ export default class IconPickerGrid extends View {
 	/**
 	 * Refreshes this icon picker grid based on a category selection.
 	 * 
-	 * @param {FontAwesomeVersion} faVersion 
-	 * @param {CategoryDefinition} categoryDefinition 
-	 * @param {Object<string, IconDefinition>} iconDefinitions
+	 * @param {FontAwesomeVersion} faVersion
+	 * @param {CategoryDefinition} categoryDefinition
+	 * @param {Object<string, IconDefinition>} iconDefinition
 	 */
-	refresh(faVersion, categoryDefinition, iconDefinitions) {
+	refresh(faVersion, iconDefinitions) {
 		this.items.clear();
-		for (const iconName of categoryDefinition.icons) {
+		for (const iconName of this.categoryDefinition.icons) {
 			const iconDefinition = iconDefinitions[iconName];
 			if (iconDefinition)
 				this.items.add(this._createItem(faVersion, iconName, iconDefinitions[iconName]));

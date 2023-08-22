@@ -12,12 +12,17 @@ import { addListToDropdown, createDropdown, FormHeaderView, Model } from 'ckedit
 
 export default class IconPickerHeader extends FormHeaderView {
 	/**
-	 * @inheritdoc
+	 * Creates a new IconPickerView.
+	 * 
+	 * @param {Locale} locale
+	 *   The locale.
+	 * @param {Object<string, CategoryDefinition>} faCategories
+	 *   The Font Awesome category definitions.
 	 */
-	constructor(locale, categories) {
+	constructor(locale, faCategories) {
 		super(locale);
 
-		this.categoryDropdownView = this._createCategoryDropdown(locale, categories);
+		this.categoryDropdownView = this._createCategoryDropdown(locale, faCategories);
 		this.categoryDropdownView.panelPosition = locale.uiLanguageDirection === 'rtl' ? 'se' : 'sw';
 
 		this.label = locale.t('Icons');
@@ -38,10 +43,11 @@ export default class IconPickerHeader extends FormHeaderView {
 	 *   The locale.
 	 * @param {Object<string, CategoryDefinition>} categories
 	 *   The object containing the category definitions.
-	 * @returns {DropdownView} The category selection dropdown.
+	 * @returns {DropdownView}
+	 *   The category selection dropdown.
 	 */
-	_createCategoryDropdown(locale, categories) {
-		const dropdownView = createDropdown(this.locale), items = createCategoryDropdownItems(locale, dropdownView, categories), defaultLabel = 'Select a category', t = locale.t;
+	_createCategoryDropdown(locale, faCategories) {
+		const dropdownView = createDropdown(locale), items = createCategoryDropdownItems(locale, dropdownView, faCategories), defaultLabel = 'Select a category', t = locale.t;
 
 		dropdownView.buttonView.set({
 			label: t(defaultLabel),
@@ -49,9 +55,12 @@ export default class IconPickerHeader extends FormHeaderView {
 			withText: true,
 			class: ['ck-dropdown__button_label-width_auto']
 		});
-		dropdownView.buttonView.bind('label').to(dropdownView, 'value', value => t(categories[value] ? categories[value].label : defaultLabel));
-		dropdownView.on('execute', eventInfo => dropdownView.set('value', eventInfo.source.name));
-		dropdownView.delegate('execute').to(this);
+		dropdownView.buttonView.bind('label').to(this, 'categoryDefinition', value => t(value ? value.label : defaultLabel));
+		dropdownView.on('execute', eventInfo => { 
+			const categoryName = eventInfo.source.name;
+			dropdownView.set('value', eventInfo.source.name);
+			this.fire('execute', categoryName, categories[categoryName]);
+		});
 
 		addListToDropdown(dropdownView, items);
 
@@ -64,16 +73,16 @@ export default class IconPickerHeader extends FormHeaderView {
  *   The locale.
  * @param {DropdownView} dropdownView 
  *   The dropdown view.
- * @param {Object<string, CategoryDefinition>} categories
- *   The object containing the category definitions.
+ * @param {Object<string, CategoryDefinition>} faCategories
+ *   The Font Awesome category definitions.
  * @returns {Collection<ListDropdownItemDefinition>}
  *   The opts for the dropdown view.
  */
-function createCategoryDropdownItems(locale, dropdownView, categories) {
+function createCategoryDropdownItems(locale, dropdownView, faCategories) {
 	/** @type {Collection<ListDropdownItemDefinition>} */
 	const items = new Collection();
 
-	for (const [name, definition] of Object.entries(categories)) {
+	for (const [name, definition] of Object.entries(faCategories)) {
 		const model = new Model({
 			name,
 			label: locale.t(definition.label),

@@ -1,7 +1,6 @@
 /**
  * @file contains the icon picker submit form.
  * 
- * @typedef { import('../iconconfig').IconDefinition } IconDefinition
  * @typedef { import('@ckeditor/ckeditor5-utils').Locale } Locale
  */
 
@@ -19,8 +18,6 @@ export default class IconPickerForm extends View {
 		super(locale);
 
 		const t = locale.t;
-
-		this.set('iconName', null);
 
 		this.submitButtonView = createButton(t('Insert icon'), icons.check, 'ck-button-save');
 		this.submitButtonView.bind('isEnabled').to(this, 'iconName', value => !!value);

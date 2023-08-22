@@ -13,13 +13,13 @@ export default class IconPickerItem extends ButtonView {
 	/**
 	 * Creates a new IconPickerItem.
 	 * 
-	 * @param {Locale} locale 
+	 * @param {Locale} locale
 	 *   The locale.
-	 * @param {FontAwesomeVersion} faVersion 
-	 *   The version of FontAwesome being used.
-	 * @param {string} iconName 
+	 * @param {FontAwesomeVersion} faVersion
+	 *   The version of Font Awesome being used.
+	 * @param {string} iconName
 	 *   The name of the icon this button is for.
-	 * @param {IconDefinition} iconDefinition 
+	 * @param {IconDefinition} iconDefinition
 	 *   The defintion of the icon this button is for.
 	 */
 	constructor(locale, faVersion, iconName, iconDefinition) {

@@ -5,11 +5,11 @@
  * @typedef { import('@ckeditor/ckeditor5-core').Command } Command
  * @typedef { import('@ckeditor/ckeditor5-ui/src/dropdown/dropdownview').default } DropdownView
  * @typedef { import('@ckeditor/ckeditor5-core/src/editor/editorwithui').EditorWithUI } EditorWithUI
- * @typedef { import('../iconconfig').SelectableOption } SelectableOption
+ * @typedef { import('./iconconfig').SelectableOption } SelectableOption
  */
 
 import { ButtonView, createDropdown, addToolbarToDropdown } from 'ckeditor5/src/ui';
-import { sizeOptions, sizeDefault, alignmentOptions, alignmentDefault } from '../iconconfig';
+import { sizeOptions, sizeDefault, alignmentOptions, alignmentDefault } from './iconconfig';
 import { Plugin, icons } from 'ckeditor5/src/core';
 import { WidgetToolbarRepository } from 'ckeditor5/src/widget';
 

@@ -13,15 +13,15 @@ export default class IconPickerFAIcon extends View {
 	/**
 	 * Creates a new IconPickerFAIcon.
 	 * 
-	 * @param {Locale} locale 
+	 * @param {Locale} locale
 	 *   The locale.
-	 * @param {FontAwesomeVersion} faVersion 
-	 *   The version of FontAwesome being used.
-	 * @param {string} iconName 
+	 * @param {FontAwesomeVersion} faVersion
+	 *   The version of Font Awesome being used.
+	 * @param {string} iconName
 	 *   The name of the icon this button is for.
-	 * @param {IconDefinition} iconDefinition 
+	 * @param {IconDefinition} iconDefinition
 	 *   The defintion of the icon this button is for.
-	 * @param {string?} iconStyle 
+	 * @param {string?} iconStyle
 	 *   The preferred style to display the icon in (optional).
 	 */
 	constructor(locale, faVersion, iconName, iconDefinition, iconStyle) {
