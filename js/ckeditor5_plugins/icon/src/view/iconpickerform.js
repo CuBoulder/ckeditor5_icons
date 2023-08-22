@@ -19,18 +19,22 @@ export default class IconPickerForm extends View {
 
 		const t = locale.t;
 
-		this.submitButtonView = createButton(t('Insert icon'), icons.check, 'ck-button-save');
-		this.submitButtonView.bind('isEnabled').to(this, 'iconName', value => !!value);
+		this.submitButtonView = createButton(t('Insert'), icons.check, 'ck-button-save');
+		this.submitButtonView.bind('isVisible').to(this, 'iconName', value => !!value);
 		// Submit type of the button will trigger the submit event on entire form when clicked 
 		//(see submitHandler() in render() below).
 		this.submitButtonView.type = 'submit';
+
+		this.cancelButtonView = createButton(t('Cancel'), icons.cancel, 'ck-button-cancel');
+		this.cancelButtonView.bind('isVisible').to(this, 'iconName', value => !!value);
+		this.cancelButtonView.delegate('execute').to(this, 'cancel');
 
 		this.setTemplate({
 			tag: 'form',
 			attributes: {
 				class: ['ckeditor5-icons__picker-form']
 			},
-			children: [this.submitButtonView]
+			children: [this.submitButtonView, this.cancelButtonView]
 		});
 	}
 
@@ -49,7 +53,8 @@ export default class IconPickerForm extends View {
 	 * Focuses the first focusable.
 	 */
 	focus() {
-		this.submitButtonView.focus();
+		if (this.submitButtonView.isEnabled)
+			this.submitButtonView.focus();
 	}
 }
 

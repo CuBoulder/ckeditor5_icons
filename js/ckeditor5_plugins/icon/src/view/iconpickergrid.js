@@ -153,6 +153,15 @@ export default class IconPickerGrid extends View {
 	 * Focuses the first focusable in `items`.
 	 */
 	focus() {
-		this.items.first.focus();
+		if (this.iconName) {
+			const item = this.items.find(item => item.isOn);
+			if (item) {
+				item.focus();
+				return;
+			}
+		}
+		const first = this.items.first;
+		if (first)
+			first.focus();
 	}
 }

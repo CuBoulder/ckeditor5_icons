@@ -45,8 +45,9 @@ export default class IconPickerFooter extends View {
 		});
 
 		this.formView = new IconPickerForm(locale);
-		this.formView.bind('iconName').to(this, 'iconName');
+		this.formView.bind('iconName').to(this);
 		this.listenTo(this.formView, 'submit', () => this.fire('execute'));
+		this.formView.delegate('cancel').to(this);
 
 		this.setTemplate({
 			tag: 'div',
