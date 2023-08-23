@@ -15,12 +15,15 @@ export default class IconPickerFooter extends View {
 	 * 
 	 * @param {Locale} locale
 	 *   The locale.
+	 * @param {FontAwesomeVersion} faVersion
+	 *   The version of Font Awesome being used.
 	 */
-	constructor(locale) {
+	constructor(locale, faVersion) {
 		super(locale);
 
 		const t = locale.t, bind = this.bindTemplate;
 
+		this.faVersion = faVersion;
 		this.set('iconLabel', 'Select an icon');
 
 		this.items = this.createCollection();
@@ -38,7 +41,7 @@ export default class IconPickerFooter extends View {
 		this.iconLabelView.setTemplate({
 			tag: 'span',
 			attributes: {
-				class: ['ck', 'ckeditor5-icons__icon-label']
+				class: ['ck', 'ckeditor5-icons__icon-label', bind.to('iconName', value => value ? '' : 'ck-hidden')]
 			},
 			children: [{ text: bind.to('iconLabel', value => t(value)) }]
 		});
@@ -46,7 +49,7 @@ export default class IconPickerFooter extends View {
 		this.formView = new IconPickerForm(locale);
 		this.formView.extendTemplate({
 			attributes: {
-				class: bind.to('iconName', value => value ? '' : 'ck-hidden')
+				class: ['ck', bind.to('iconName', value => value ? '' : 'ck-hidden')]
 			}
 		});
 		this.formView.bind('iconName', 'iconStyle', 'iconDefinition').to(this);
@@ -67,6 +70,13 @@ export default class IconPickerFooter extends View {
 					},
 					children: [this.iconPreviewView, this.iconLabelView]
 				},
+				{
+					tag: 'div',
+					attributes: {
+						class: ['ck', 'ckeditor5-icons__library-info', bind.to('iconName', value => value ? 'ck-hidden' : '')]
+					},
+					children: [{ text: faVersion === '5' ? 'Font Awesome 5' : 'Font Awesome 6' }]
+				},
 				this.formView
 			]
 		});
@@ -75,12 +85,10 @@ export default class IconPickerFooter extends View {
 	/**
 	 * Refreshes the icon picker footer when an icon in the grid is selected.
 	 * 
-	 * @param {FontAwesomeVersion} faVersion
-	 *   The version of Font Awesome being used.
 	 * @param {string[]} faStyles
 	 *   The enabled Font Awesome icon styles.
 	 */
-	refresh(faVersion, faStyles) {
+	refresh(faStyles) {
 		if (this.iconDefinition) {
 			this.set('iconLabel', this.iconDefinition.label);
 			this.formView.refresh(faStyles);
@@ -95,7 +103,7 @@ export default class IconPickerFooter extends View {
 		}
 
 		if (this.iconName && this.iconDefinition) {
-			faIcon = new IconPickerFAIcon(this.locale, faVersion, this.iconName, this.iconDefinition, this.iconStyle);
+			faIcon = new IconPickerFAIcon(this.locale, this.faVersion, this.iconName, this.iconDefinition, this.iconStyle);
 			iconPreviewView.registerChild(faIcon);
 			iconPreviewView.element.appendChild(faIcon.element);
 		}

@@ -38,8 +38,8 @@ export default class IconPickerView extends View {
 		this.set('iconDefinition', null);
 
 		const headerView = this.headerView = new IconPickerHeader(locale, faCategories);
-		const gridView = this.gridView = new IconPickerGrid(locale);
-		const footerView = this.footerView = new IconPickerFooter(locale);
+		const gridView = this.gridView = new IconPickerGrid(locale, faVersion);
+		const footerView = this.footerView = new IconPickerFooter(locale, faVersion);
 
 		const items = this.items = this.createCollection();
 		const focusTracker = this.focusTracker = new FocusTracker();
@@ -75,8 +75,8 @@ export default class IconPickerView extends View {
 			this.set('categoryDefinition', categoryDefinition);
 			this.set('iconName', null);
 			this.set('iconDefinition', null);
-			gridView.refresh(faVersion, faIcons);
-			footerView.refresh(faVersion, faStyles);
+			gridView.refresh(faIcons);
+			footerView.refresh(faStyles);
 			this._startTrackingGrid();
 			this._stopTrackingFooterForm();
 		});
@@ -86,14 +86,14 @@ export default class IconPickerView extends View {
 			this.set('iconName', iconName);
 			this.set('iconStyle', getValidIconStyle(iconDefinition, this.iconStyle));
 			this.set('iconDefinition', iconDefinition);
-			footerView.refresh(faVersion, faStyles);
+			footerView.refresh(faStyles);
 			this._startTrackingFooterForm();
 		});
 
 		// Handles the icon style change event.
 		this.listenTo(footerView, 'changeStyle', (eventInfo, iconStyle) => {
 			this.set('iconStyle', iconStyle);
-			footerView.refresh(faVersion, faStyles);
+			footerView.refresh(faStyles);
 		});
 
 		// Handles the icon insert cancel event.
@@ -102,7 +102,7 @@ export default class IconPickerView extends View {
 				gridView.focus();
 			this.set('iconName', null);
 			this.set('iconDefinition', null);
-			footerView.refresh(faVersion, faStyles);
+			footerView.refresh(faStyles);
 			this._stopTrackingFooterForm();
 		});
 

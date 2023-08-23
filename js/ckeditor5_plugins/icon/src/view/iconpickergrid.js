@@ -18,10 +18,13 @@ export default class IconPickerGrid extends View {
 	 * 
 	 * @param {Locale} locale
 	 *   The locale.
+	 * @param {FontAwesomeVersion} faVersion
+	 *   The version of Font Awesome being used.
 	 */
-	constructor(locale) {
+	constructor(locale, faVersion) {
 		super(locale);
 
+		this.faVersion = faVersion;
 		this.items = this.createCollection();
 
 		this.setTemplate({
@@ -65,14 +68,13 @@ export default class IconPickerGrid extends View {
 	}
 
 	/**
-	 * @param {FontAwesomeVersion} faVersion
 	 * @param {string} iconName
 	 * @param {IconDefinition} iconDefinition
 	 * @returns {IconPickerItem}
 	 *   An IconPickerItem created based on the provded icon.
 	 */
-	_createItem(faVersion, iconName, iconDefinition) {
-		const item = new IconPickerItem(this.locale, faVersion, iconName, iconDefinition), t = this.locale.t;
+	_createItem(iconName, iconDefinition) {
+		const item = new IconPickerItem(this.locale, this.faVersion, iconName, iconDefinition), t = this.locale.t;
 
 		this.set('iconName', null);
 
@@ -103,16 +105,15 @@ export default class IconPickerGrid extends View {
 	/**
 	 * Refreshes this icon picker grid based on a category selection.
 	 * 
-	 * @param {FontAwesomeVersion} faVersion
 	 * @param {CategoryDefinition} categoryDefinition
 	 * @param {Object<string, IconDefinition>} iconDefinition
 	 */
-	refresh(faVersion, iconDefinitions) {
+	refresh(iconDefinitions) {
 		this.items.clear();
 		for (const iconName of this.categoryDefinition.icons) {
 			const iconDefinition = iconDefinitions[iconName];
 			if (iconDefinition)
-				this.items.add(this._createItem(faVersion, iconName, iconDefinitions[iconName]));
+				this.items.add(this._createItem(iconName, iconDefinitions[iconName]));
 		}
 	}
 

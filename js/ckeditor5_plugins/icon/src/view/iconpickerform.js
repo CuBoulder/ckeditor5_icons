@@ -104,7 +104,8 @@ export default class IconPickerForm extends View {
 		dropdownView.buttonView.set({
 			label: t(defaultLabel),
 			tooltip: t('Styles available for this icon'),
-			withText: true
+			withText: true,
+			class: 'ck-dropdown__button_label-width_auto'
 		});
 		dropdownView.buttonView.bind('label').to(this, 'iconStyle', value => t(value ? faStyleLabels[value] || value : defaultLabel));
 		dropdownView.on('execute', eventInfo => {

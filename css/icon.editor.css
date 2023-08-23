@@ -16,13 +16,19 @@
 }
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-form > *,
+.ck .ck.ckeditor5-icons__picker-footer > .ck.ckeditor5-icons__library-info,
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview > .ck.ckeditor5-icons__icon-label {
 	font-size: var(--ck-font-size-small);
-	text-transform: uppercase;
 }
 
-.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon-preview {
-	display: inline-block;
+.ck .ck.ckeditor5-icons__picker-footer > .ck.ckeditor5-icons__library-info {
+	font-size: var(--ck-font-size-tiny);
+	opacity: .6;
+}
+
+.ck .ck.ckeditor5-icons__picker-footer > .ck.ckeditor5-icons__library-info,
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon-label {
+	text-transform: uppercase;
 }
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon-preview .ck.ckeditor5-icons__icon {

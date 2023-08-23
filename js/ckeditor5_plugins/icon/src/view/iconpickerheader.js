@@ -26,7 +26,7 @@ export default class IconPickerHeader extends FormHeaderView {
 		this.categoryDropdownView.panelPosition = locale.uiLanguageDirection === 'rtl' ? 'se' : 'sw';
 
 		this.label = locale.t('Icons');
-		this.class = ['ckeditor5-icons__picker-header'];
+		this.class = 'ckeditor5-icons__picker-header';
 
 		this.children.add(this.categoryDropdownView);
 	}
@@ -53,7 +53,7 @@ export default class IconPickerHeader extends FormHeaderView {
 			label: t(defaultLabel),
 			tooltip: t('Icon categories'),
 			withText: true,
-			class: ['ck-dropdown__button_label-width_auto']
+			class: 'ck-dropdown__button_label-width_auto'
 		});
 		dropdownView.buttonView.bind('label').to(this, 'categoryDefinition', value => t(value ? value.label : defaultLabel));
 		dropdownView.on('execute', eventInfo => { 
