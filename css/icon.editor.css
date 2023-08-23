@@ -1,21 +1,37 @@
-.ck .ckeditor5-icons__picker-header .ck-dropdown__panel .ck-list {
-	max-height: 256px;
-	overflow-y: auto;
-}
-
-.ck .ckeditor5-icons__picker-footer {
-	align-items: baseline;
-}
-
-.ck .ckeditor5-icons__icon-picker-footer .ckeditor5-icons__icon {
-	font-size: 1.5em;
-}
-
 .ck .ck.ck-icon.ckeditor5-icons__icon {
 	text-align: center;
 }
 
-.ck svg.ckeditor5-icons__icon {
+.ck .ck.ckeditor5-icons__picker-header .ck.ck-dropdown__panel .ck.ck-list {
+	max-height: 256px;
+	overflow-y: auto;
+}
+
+.ck .ck.ckeditor5-icons__picker-footer {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	border-top: 1px solid var(--ck-color-base-border);
+	padding: var(--ck-spacing-small) var(--ck-spacing-large);
+}
+
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-form > *,
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview > .ck.ckeditor5-icons__icon-label {
+	font-size: var(--ck-font-size-small);
+	text-transform: uppercase;
+}
+
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon-preview {
+	display: inline-block;
+}
+
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon-preview .ck.ckeditor5-icons__icon {
+	font-size: var(--ck-font-size-large);
+	margin-right: .3em;
+}
+
+.ck svg.ck.ckeditor5-icons__icon,
+.ck .ck.ckeditor5-icons__icon svg {
 	height: 1em;
 }
 

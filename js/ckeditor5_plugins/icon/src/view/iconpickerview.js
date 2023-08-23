@@ -25,14 +25,16 @@ export default class IconPickerView extends View {
 	 *   The Font Awesome category definitions.
 	 * @param {Object<string, IconDefinition>} faIcons
 	 *   The Font Awesome icon definitions.
+	 * @param {string[]} faStyles
+	 *   The enabled Font Awesome icon styles.
 	 */
-	constructor(locale, faVersion, faCategories, faIcons) {
+	constructor(locale, faVersion, faCategories, faIcons, faStyles) {
 		super(locale);
 
 		this.set('categoryName', null);
 		this.set('categoryDefinition', null);
 		this.set('iconName', null);
-		this.set('iconStyle', 'solid');
+		this.set('iconStyle', faStyles[0]);
 		this.set('iconDefinition', null);
 
 		const headerView = this.headerView = new IconPickerHeader(locale, faCategories);
@@ -74,7 +76,7 @@ export default class IconPickerView extends View {
 			this.set('iconName', null);
 			this.set('iconDefinition', null);
 			gridView.refresh(faVersion, faIcons);
-			footerView.refresh(faVersion);
+			footerView.refresh(faVersion, faStyles);
 			this._startTrackingGrid();
 			this._stopTrackingFooterForm();
 		});
@@ -84,8 +86,14 @@ export default class IconPickerView extends View {
 			this.set('iconName', iconName);
 			this.set('iconStyle', getValidIconStyle(iconDefinition, this.iconStyle));
 			this.set('iconDefinition', iconDefinition);
-			footerView.refresh(faVersion);
+			footerView.refresh(faVersion, faStyles);
 			this._startTrackingFooterForm();
+		});
+
+		// Handles the icon style change event.
+		this.listenTo(footerView, 'changeStyle', (eventInfo, iconStyle) => {
+			this.set('iconStyle', iconStyle);
+			footerView.refresh(faVersion, faStyles);
 		});
 
 		// Handles the icon insert cancel event.
@@ -94,7 +102,7 @@ export default class IconPickerView extends View {
 				gridView.focus();
 			this.set('iconName', null);
 			this.set('iconDefinition', null);
-			footerView.refresh(faVersion);
+			footerView.refresh(faVersion, faStyles);
 			this._stopTrackingFooterForm();
 		});
 
@@ -147,11 +155,13 @@ export default class IconPickerView extends View {
 	}
 
 	_startTrackingFooterForm() {
+		this._startTracking(this.footerView.formView.styleDropdownView.buttonView);
 		this._startTracking(this.footerView.formView.submitButtonView);
 		this._startTracking(this.footerView.formView.cancelButtonView);
 	}
 
 	_stopTrackingFooterForm() {
+		this._startTracking(this.footerView.formView.styleDropdownView.buttonView);
 		this._stopTracking(this.footerView.formView.submitButtonView);
 		this._stopTracking(this.footerView.formView.cancelButtonView);
 	}

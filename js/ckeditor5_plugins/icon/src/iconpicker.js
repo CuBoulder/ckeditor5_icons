@@ -16,6 +16,7 @@ import { Plugin } from 'ckeditor5/src/core';
 import iconIcon from '../../../../icons/icon.svg';
 import IconPickerView from './view/iconpickerview';
 import { getFAStyleClass } from './iconutils';
+import { faStyleLabels } from './iconconfig';
 
 export default class IconPicker extends Plugin {
 	/**
@@ -35,6 +36,8 @@ export default class IconPicker extends Plugin {
 		/** @type {Object<string, IconDefinition>} */
 		const faIcons = config.get('icon.faIcons');
 
+		const styles = Object.keys(faStyleLabels);
+
 		// This will register the icon toolbar button.
 		componentFactory.add('icon', (locale) => {
 			const dropdownView = createDropdown(locale);
@@ -52,7 +55,7 @@ export default class IconPicker extends Plugin {
 
 			dropdownView.on('change:isOpen', () => {
 				if (!iconPickerView) {
-					iconPickerView = new IconPickerView(locale, faVersion, faCategories, faIcons);
+					iconPickerView = new IconPickerView(locale, faVersion, faCategories, faIcons, styles);
 					this.listenTo(iconPickerView, 'execute', eventInfo => { // Inserts the icon when the icon picker view fires the `execute` event.
 						const { iconName, iconStyle } = eventInfo.source;
 						command.execute({ iconClass: getFAStyleClass(faVersion, iconStyle) + ' fa-' + iconName });

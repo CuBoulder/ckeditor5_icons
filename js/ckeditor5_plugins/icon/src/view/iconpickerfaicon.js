@@ -31,6 +31,7 @@ export default class IconPickerFAIcon extends View {
 			tag: 'i',
 			attributes: {
 				class: [
+					'ck',
 					'ckeditor5-icons__icon',
 					getFAStyleClass(faVersion, getValidIconStyle(iconDefinition, iconStyle)),
 					'fa-' + iconName

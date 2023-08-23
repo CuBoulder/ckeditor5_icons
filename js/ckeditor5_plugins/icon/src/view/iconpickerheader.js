@@ -58,7 +58,7 @@ export default class IconPickerHeader extends FormHeaderView {
 		dropdownView.buttonView.bind('label').to(this, 'categoryDefinition', value => t(value ? value.label : defaultLabel));
 		dropdownView.on('execute', eventInfo => { 
 			const categoryName = eventInfo.source.name;
-			dropdownView.set('value', eventInfo.source.name);
+			dropdownView.set('value', categoryName);
 			this.fire('execute', categoryName, faCategories[categoryName]);
 		});
 

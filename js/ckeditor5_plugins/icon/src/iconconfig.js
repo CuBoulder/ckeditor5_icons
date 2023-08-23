@@ -95,7 +95,19 @@ export const alignmentOptions = {
 export const alignmentDefault = 'none';
 
 /**
- * Provides a definition of FA styles by version.
+ * Labels for all the style options.
+ */
+export const faStyleLabels = {
+	'solid': 'Solid',
+	'regular': 'Regular',
+	'light': 'Light',
+	'thin': 'Thin',
+	'duotone': 'Duotone',
+	'brands': 'Brands'
+}
+
+/**
+ * A definition of Font Awesome style classes by version.
  */
 export const faStylesByVersion = {
 	'6': {

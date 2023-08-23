@@ -6,7 +6,6 @@
  */
 
 import { View } from 'ckeditor5/src/ui';
-import { getValidIconStyle } from '../iconutils';
 import IconPickerFAIcon from './iconpickerfaicon';
 import IconPickerForm from './iconpickerform';
 
@@ -31,7 +30,7 @@ export default class IconPickerFooter extends View {
 		this.iconPreviewView.setTemplate({
 			tag: 'span',
 			attributes: {
-				class: ['ckeditor5-icons__picker-preview']
+				class: ['ck', 'ckeditor5-icons__icon-preview']
 			}
 		});
 
@@ -39,22 +38,37 @@ export default class IconPickerFooter extends View {
 		this.iconLabelView.setTemplate({
 			tag: 'span',
 			attributes: {
-				class: ['ckeditor5-icons__picker-label']
+				class: ['ck', 'ckeditor5-icons__icon-label']
 			},
 			children: [{ text: bind.to('iconLabel', value => t(value)) }]
 		});
 
 		this.formView = new IconPickerForm(locale);
-		this.formView.bind('iconName').to(this);
-		this.listenTo(this.formView, 'submit', () => this.fire('execute'));
+		this.formView.extendTemplate({
+			attributes: {
+				class: bind.to('iconName', value => value ? '' : 'ck-hidden')
+			}
+		});
+		this.formView.bind('iconName', 'iconStyle', 'iconDefinition').to(this);
+		this.formView.delegate('changeStyle').to(this);
 		this.formView.delegate('cancel').to(this);
+		this.listenTo(this.formView, 'submit', () => this.fire('execute'));
 
 		this.setTemplate({
 			tag: 'div',
 			attributes: {
-				class: ['ck', 'ck-character-info', 'ckeditor5-icons__picker-footer']
+				class: ['ck', 'ckeditor5-icons__picker-footer']
 			},
-			children: [this.iconPreviewView, this.iconLabelView, this.formView]
+			children: [
+				{
+					tag: 'div',
+					attributes: {
+						class: ['ck', 'ckeditor5-icons__picker-preview']
+					},
+					children: [this.iconPreviewView, this.iconLabelView]
+				},
+				this.formView
+			]
 		});
 	}
 
@@ -63,10 +77,13 @@ export default class IconPickerFooter extends View {
 	 * 
 	 * @param {FontAwesomeVersion} faVersion
 	 *   The version of Font Awesome being used.
+	 * @param {string[]} faStyles
+	 *   The enabled Font Awesome icon styles.
 	 */
-	refresh(faVersion) {
+	refresh(faVersion, faStyles) {
 		if (this.iconDefinition) {
 			this.set('iconLabel', this.iconDefinition.label);
+			this.formView.refresh(faStyles);
 		} else this.set('iconLabel', 'Select an icon');
 
 		const iconPreviewView = this.iconPreviewView;
