@@ -75,9 +75,10 @@ export default class IconPickerView extends View {
 			this.set('categoryDefinition', categoryDefinition);
 			this.set('iconName', null);
 			this.set('iconDefinition', null);
+			this._startTrackingGrid();
 			gridView.refresh(faIcons);
 			footerView.refresh(faStyles);
-			this._startTrackingGrid();
+			footerView.set('focusedIconDefinition', null);
 			this._stopTrackingFooterForm();
 		});
 
@@ -88,6 +89,23 @@ export default class IconPickerView extends View {
 			this.set('iconDefinition', iconDefinition);
 			footerView.refresh(faStyles);
 			this._startTrackingFooterForm();
+		});
+
+		// Handles the icon hover event from the grid.
+		this.listenTo(gridView, 'itemHover', (eventInfo, iconName, iconDefinition) => {
+			footerView.set('focusedIconDefinition', iconDefinition);
+		});
+
+		// Handles the icon focus event from the grid.
+		this.listenTo(gridView, 'itemFocus', (eventInfo, iconName, iconDefinition) => {
+			footerView.set('focusedIconDefinition', iconDefinition);
+		});
+
+		// Tracks the "Show more" button in the grid view.
+		this.listenTo(gridView, 'showMorePossible', (eventInfo, value) => {
+			if (value)
+				this._startTracking(gridView.showMoreButtonView);
+			else this._stopTracking(gridView.showMoreButtonView);
 		});
 
 		// Handles the icon style change event.

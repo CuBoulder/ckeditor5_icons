@@ -7,10 +7,11 @@
  * @typedef { import('@ckeditor/ckeditor5-utils').Locale } Locale
  */
 
-import { FocusTracker, KeystrokeHandler } from "ckeditor5/src/utils";
+import { Collection, FocusTracker, KeystrokeHandler } from "ckeditor5/src/utils";
 import { View } from 'ckeditor5/src/ui';
 import addKeyboardHandlingForGrid from '@ckeditor/ckeditor5-ui/src/bindings/addkeyboardhandlingforgrid';
 import IconPickerItem from './iconpickeritem';
+import { ButtonView } from "ckeditor5/src/ui";
 
 export default class IconPickerGrid extends View {
 	/**
@@ -23,30 +24,52 @@ export default class IconPickerGrid extends View {
 	 */
 	constructor(locale, faVersion) {
 		super(locale);
-
 		this.faVersion = faVersion;
-		this.items = this.createCollection();
+
+		this.tiles = this.createCollection();
+		this.sections = new Collection();
+
+		this.tilesView = new View();
+		this.tilesView.setTemplate({
+			tag: 'div',
+			attributes: {
+				class: [
+					'ck',
+					'ckeditor5-icons__grid-tiles'
+				]
+			}
+		});
+
+		this.showMoreButtonView = new ButtonView(locale);
+		this.showMoreButtonView.set({
+			label: '',
+			withText: true,
+			isVisible: false,
+			class: ['ck', 'ckeditor5-icons__grid-show-more']
+		});
 
 		this.setTemplate({
 			tag: 'div',
+			attributes: {
+				class: [
+					'ck',
+					'ck-character-grid',
+					'ckeditor5-icons__grid'
+				]
+			},
 			children: [
+				this.tilesView,
 				{
 					tag: 'div',
 					attributes: {
 						class: [
 							'ck',
-							'ck-character-grid__tiles'
+							'ckeditor5-icons__grid-options'
 						]
 					},
-					children: this.items
+					children: [this.showMoreButtonView]
 				}
-			],
-			attributes: {
-				class: [
-					'ck',
-					'ck-character-grid'
-				]
-			}
+			]
 		});
 
 		this.focusTracker = new FocusTracker();
@@ -57,9 +80,9 @@ export default class IconPickerGrid extends View {
 		addKeyboardHandlingForGrid({
 			keystrokeHandler: this.keystrokes,
 			focusTracker: this.focusTracker,
-			gridItems: this.items,
+			gridItems: this.tiles,
 			numberOfColumns: () => global.window
-				.getComputedStyle(this.element.firstChild) // Responsive .ck-character-grid__tiles
+				.getComputedStyle(this.tilesView.element.firstChild) // Responsive .ck-character-grid__tiles
 				.getPropertyValue('grid-template-columns')
 				.split(' ')
 				.length,
@@ -109,12 +132,14 @@ export default class IconPickerGrid extends View {
 	 * @param {Object<string, IconDefinition>} iconDefinition
 	 */
 	refresh(iconDefinitions) {
-		this.items.clear();
-		for (const iconName of this.categoryDefinition.icons) {
-			const iconDefinition = iconDefinitions[iconName];
-			if (iconDefinition)
-				this.items.add(this._createItem(iconName, iconDefinitions[iconName]));
-		}
+		this.tiles.clear();
+	
+		for (const section of this.sections)
+			this.tilesView.deregisterChild(section);
+		this.tilesView.element.innerText = '';
+		this.sections.clear();
+	
+		this._populateGrid(this.categoryDefinition.icons, iconDefinitions);
 	}
 
 	/**
@@ -123,10 +148,10 @@ export default class IconPickerGrid extends View {
 	render() {
 		super.render();
 
-		for (const item of this.items)
+		for (const item of this.tiles)
 			this.focusTracker.add(item.element);
 
-		this.items.on('change', (eventInfo, { added, removed }) => {
+		this.tiles.on('change', (eventInfo, { added, removed }) => {
 			if (added.length > 0) {
 				for (const item of added)
 					this.focusTracker.add(item.element);
@@ -155,14 +180,54 @@ export default class IconPickerGrid extends View {
 	 */
 	focus() {
 		if (this.iconName) {
-			const item = this.items.find(item => item.isOn);
+			const item = this.tiles.find(item => item.isOn);
 			if (item) {
 				item.focus();
 				return;
 			}
 		}
-		const first = this.items.first;
+		const first = this.tiles.first;
 		if (first)
 			first.focus();
+	}
+
+	_populateGrid(iconNames, iconDefinitions, startAt = 0) {
+		const max = 200, length = iconNames.length - startAt, section = new View(), sectionTiles = new Collection();
+		for (let index = 0; index < Math.min(max, length); index++) {
+			const iconName = iconNames[startAt + index], iconDefinition = iconDefinitions[iconName];
+			if (iconDefinition) {
+				const item = this._createItem(iconName, iconDefinitions[iconName])
+				sectionTiles.add(item);
+				this.tiles.add(item);
+			}
+		}
+
+		const buttonView = this.showMoreButtonView;
+		if (length > max) {
+			const t = this.locale.t;
+			buttonView.set('label', t('Show more') + ' (' + (length - max) + ')');
+			buttonView.set('isVisible', true);
+			this.listenTo(buttonView, 'execute', () => {
+				this.tiles.last.focus();
+				this._populateGrid(iconNames, iconDefinitions, startAt + max);
+			});
+			this.fire('showMorePossible', true);
+		} else {
+			this.stopListening(buttonView, 'execute');
+			this.fire('showMorePossible', false);
+			buttonView.set('isVisible', false);
+		}
+
+		section.setTemplate({
+			tag: 'div',
+			attributes: {
+				class: ['ck', 'ck-character-grid__tiles']
+			},
+			children: sectionTiles
+		});
+
+		this.sections.add(section);
+		this.tilesView.registerChild(section);
+		this.tilesView.element.appendChild(section.element);
 	}
 }

@@ -21,29 +21,26 @@ export default class IconPickerForm extends View {
 	constructor(locale) {
 		super(locale);
 
-		const t = locale.t;
+		const bind = this.bindTemplate, t = locale.t;
 
 		this.styleDropdownView = this._createStyleDropdown(locale);
-		this.styleDropdownView.bind('isEnabled').to(this, 'iconName', value => !!value);
 		this.styleDropdownView.bind('value').to(this, 'iconStyle');
 		/** @type {Collection<ListDropdownItemDefinition>} */
 		this.styleDropdownItems = new Collection();
 		addListToDropdown(this.styleDropdownView, this.styleDropdownItems);
 
 		this.submitButtonView = createButton(t('Insert'), icons.check, 'ck-button-save');
-		this.submitButtonView.bind('isEnabled').to(this, 'iconName', value => !!value);
 		// Submit type of the button will trigger the submit event on entire form when clicked 
 		//(see submitHandler() in render() below).
 		this.submitButtonView.type = 'submit';
 
 		this.cancelButtonView = createButton(t('Cancel'), icons.cancel, 'ck-button-cancel');
-		this.cancelButtonView.bind('isEnabled').to(this, 'iconName', value => !!value);
 		this.cancelButtonView.delegate('execute').to(this, 'cancel');
 
 		this.setTemplate({
 			tag: 'form',
 			attributes: {
-				class: ['ck', 'ckeditor5-icons__picker-form']
+				class: ['ck', 'ckeditor5-icons__picker-form', bind.to('iconName', value => value ? '' : 'ck-hidden')]
 			},
 			children: [this.styleDropdownView, this.submitButtonView, this.cancelButtonView]
 		});
@@ -85,7 +82,7 @@ export default class IconPickerForm extends View {
 	}
 
 	/**
-	 * Focuses the first focusable.
+	 * Focuses the submit button.
 	 */
 	focus() {
 		if (this.submitButtonView.isEnabled)

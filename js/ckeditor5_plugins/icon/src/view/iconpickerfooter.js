@@ -20,11 +20,12 @@ export default class IconPickerFooter extends View {
 	 */
 	constructor(locale, faVersion) {
 		super(locale);
+		this.faVersion = faVersion;
 
 		const t = locale.t, bind = this.bindTemplate;
 
-		this.faVersion = faVersion;
 		this.set('iconLabel', 'Select an icon');
+		this.set('focusedIconDefinition', null);
 
 		this.items = this.createCollection();
 
@@ -37,25 +38,10 @@ export default class IconPickerFooter extends View {
 			}
 		});
 
-		this.iconLabelView = new View();
-		this.iconLabelView.setTemplate({
-			tag: 'span',
-			attributes: {
-				class: ['ck', 'ckeditor5-icons__icon-label', bind.to('iconName', value => value ? '' : 'ck-hidden')]
-			},
-			children: [{ text: bind.to('iconLabel', value => t(value)) }]
-		});
-
 		this.formView = new IconPickerForm(locale);
-		this.formView.extendTemplate({
-			attributes: {
-				class: ['ck', bind.to('iconName', value => value ? '' : 'ck-hidden')]
-			}
-		});
+		this.formView.delegate('changeStyle', 'cancel').to(this);
+		this.formView.delegate('submit').to(this, 'execute');
 		this.formView.bind('iconName', 'iconStyle', 'iconDefinition').to(this);
-		this.formView.delegate('changeStyle').to(this);
-		this.formView.delegate('cancel').to(this);
-		this.listenTo(this.formView, 'submit', () => this.fire('execute'));
 
 		this.setTemplate({
 			tag: 'div',
@@ -68,14 +54,38 @@ export default class IconPickerFooter extends View {
 					attributes: {
 						class: ['ck', 'ckeditor5-icons__picker-preview']
 					},
-					children: [this.iconPreviewView, this.iconLabelView]
+					children: [
+						this.iconPreviewView,
+						{
+							tag: 'span',
+							attributes: {
+								class: ['ck', 'ckeditor5-icons__icon-label', bind.to('iconName', value => value ? '' : 'ck-hidden')]
+							},
+							children: [{ text: bind.to('iconLabel', value => t(value)) }]
+						}
+					]
 				},
 				{
 					tag: 'div',
 					attributes: {
-						class: ['ck', 'ckeditor5-icons__library-info', bind.to('iconName', value => value ? 'ck-hidden' : '')]
+						class: ['ck', 'ckeditor5__picker-info', bind.to('iconName', value => value ? 'ck-hidden' : '')]
 					},
-					children: [{ text: faVersion === '5' ? 'Font Awesome 5' : 'Font Awesome 6' }]
+					children: [
+						{
+							tag: 'div',
+							attributes: {
+								class: ['ck', 'ckeditor5-icons__focused-label']
+							},
+							children: [{ text: bind.to('focusedIconDefinition', value => value ? t(value.label) : t('Select an icon')) }]
+						},
+						{
+							tag: 'div',
+							attributes: {
+								class: ['ck', 'ckeditor5-icons__library-attr']
+							},
+							children: [{ text: faVersion === '5' ? 'Font Awesome 5' : 'Font Awesome 6' }]
+						}
+					]
 				},
 				this.formView
 			]
@@ -115,6 +125,7 @@ export default class IconPickerFooter extends View {
 	 * Focuses the form view.
 	 */
 	focus() {
-		this.formView.focus();
+		if (this.iconName)
+			this.formView.focus();
 	}
 }
