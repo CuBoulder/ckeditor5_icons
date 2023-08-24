@@ -66,7 +66,9 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 	 */
 	public function defaultConfiguration() {
 		return [
-			'fa_version' => '6'
+			'fa_version' => '6',
+			'recommended_enabled' => FALSE,
+			'recommended_icons' => ['drupal', 'plus', 'font-awesome', 'equals', 'heart']
 		];
 	}
 
@@ -86,6 +88,17 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 			],
 			'#default_value' => $this->configuration['fa_version']
 		];
+		$form['recommended_enabled'] = [
+			'#type' => 'checkbox',
+			'#title' => $this->t('Show the Recommended category'),
+			'#default_value' => $this->configuration['recommended_enabled']
+		];
+		$form['recommended_icons'] = [
+			'#type' => 'textfield',
+			'#title' => $this->t('Recommended icons'),
+			'#description' => $this->t('Comma-separated icon names to display in the Recommended category. For a complete list of icons names visit <a target="_blank" href="@fa_url">Font Awesome\'s website</a>.', ['@fa_url' => 'https://fontawesome.com/search?m=free']),
+			'#default_value' => implode(',', $this->configuration['recommended_icons'])
+		];
 		return $form;
 	}
 
@@ -93,9 +106,13 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 	 * {@inheritdoc}
 	 */
 	public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
-		$form_value = $form_state->getValue('fa_version');
-		$config_value = $this->manager->toValidFAVersion($form_value);
-		$form_state->setValue('fa_version', $config_value);
+		$form_state->setValue('fa_version', $this->manager->toValidFAVersion($form_state->getValue('fa_version')));
+		$form_state->setValue('recommended_enabled', $form_state->getValue('recommended_enabled') ? true : false);
+		$form_state->setValue('recommended_icons', array_filter(array_map(function($value) {
+				return preg_replace('/([^a-z0-9\-]+)/', '', strtolower($value));
+			}, explode(',', $form_state->getValue('recommended_icons'))), function($value) {
+				return (bool) $value;
+			}));
 	}
 
 	/**
@@ -103,6 +120,8 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 	 */
 	public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
 		$this->configuration['fa_version'] = $form_state->getValue('fa_version');
+		$this->configuration['recommended_enabled'] = $form_state->getValue('recommended_enabled');
+		$this->configuration['recommended_icons'] = $form_state->getValue('recommended_icons');
 	}
 
 	/**
@@ -114,7 +133,8 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 			'icon' => [
 				'faVersion' => $faVersion,
 				'faCategories' => $this->manager->getFACategories($faVersion),
-				'faIcons' => $this->manager->getFAIcons($faVersion)
+				'faIcons' => $this->manager->getFAIcons($faVersion),
+				'recommendedIcons' => $this->configuration['recommended_enabled'] ? $this->configuration['recommended_icons'] : null
 			]
 		];
 	}

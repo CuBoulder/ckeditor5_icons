@@ -6,3 +6,12 @@ ckeditor5.plugin.ckeditor5_icons_icon:
     fa_version:
       type: string
       label: 'Font Awesome library version'
+    recommended_enabled:
+      type: boolean
+      label: 'Show recommended'
+    recommended_icons:
+      type: sequence
+      label: 'Recommended icons'
+      sequence:
+        type: string
+        label: 'Icon names'

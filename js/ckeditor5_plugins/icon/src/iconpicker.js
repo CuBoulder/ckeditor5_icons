@@ -36,6 +36,9 @@ export default class IconPicker extends Plugin {
 		/** @type {Object<string, IconDefinition>} */
 		const faIcons = config.get('icon.faIcons');
 
+		/** @type {string[]?} */
+		const recommendedIcons = config.get('icon.recommendedIcons');
+
 		const styles = Object.keys(faStyleLabels);
 
 		// This will register the icon toolbar button.
@@ -55,7 +58,7 @@ export default class IconPicker extends Plugin {
 
 			dropdownView.on('change:isOpen', () => {
 				if (!iconPickerView) {
-					iconPickerView = new IconPickerView(locale, faVersion, faCategories, faIcons, styles);
+					iconPickerView = new IconPickerView(locale, faVersion, faCategories, faIcons, styles, recommendedIcons);
 					this.listenTo(iconPickerView, 'execute', eventInfo => { // Inserts the icon when the icon picker view fires the `execute` event.
 						const { iconName, iconStyle } = eventInfo.source;
 						command.execute({ iconClass: getFAStyleClass(faVersion, iconStyle) + ' fa-' + iconName });

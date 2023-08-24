@@ -27,8 +27,10 @@ export default class IconPickerView extends View {
 	 *   The Font Awesome icon definitions.
 	 * @param {string[]} faStyles
 	 *   The enabled Font Awesome icon styles.
+	 * @param {string[]?} recommendedIcons
+	 *   The icons to display in the recommended category.
 	 */
-	constructor(locale, faVersion, faCategories, faIcons, faStyles) {
+	constructor(locale, faVersion, faCategories, faIcons, faStyles, recommendedIcons) {
 		super(locale);
 
 		this.set('categoryName', null);
@@ -37,7 +39,7 @@ export default class IconPickerView extends View {
 		this.set('iconStyle', faStyles[0]);
 		this.set('iconDefinition', null);
 
-		const headerView = this.headerView = new IconPickerHeader(locale, faCategories, faStyles);
+		const headerView = this.headerView = new IconPickerHeader(locale, faCategories, faStyles, recommendedIcons);
 		const gridView = this.gridView = new IconPickerGrid(locale, faVersion);
 		const footerView = this.footerView = new IconPickerFooter(locale, faVersion);
 
@@ -140,6 +142,11 @@ export default class IconPickerView extends View {
 
 		// Ensures the `execute` and `cancel` events of the icon picker view fires when someone confirms an icon insert.
 		footerView.delegate('execute', 'cancel').to(this);
+
+		// Fires the initial event to populate the grid view.
+		if (faCategories._recommended)
+			headerView.fire('execute', '_recommended', faCategories._recommended);
+		else headerView.fire('execute', '_all', faCategories._all);
 	}
 
 	/**

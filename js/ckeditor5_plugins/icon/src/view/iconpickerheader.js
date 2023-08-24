@@ -20,11 +20,13 @@ export default class IconPickerHeader extends FormHeaderView {
 	 *   The Font Awesome category definitions.
 	 * @param {string[]} faStyles
 	 *   The enabled Font Awesome icon styles.
+	 * @param {string[]?} recommendedIcons
+	 *   The icons to display in the recommended category.
 	 */
-	constructor(locale, faCategories, faStyles) {
+	constructor(locale, faCategories, faStyles, recommendedIcons) {
 		super(locale);
 
-		this.categoryDropdownView = this._createCategoryDropdown(locale, faCategories, faStyles);
+		this.categoryDropdownView = this._createCategoryDropdown(locale, faCategories, faStyles, recommendedIcons);
 		this.categoryDropdownView.panelPosition = locale.uiLanguageDirection === 'rtl' ? 'se' : 'sw';
 
 		this.label = locale.t('Icons');
@@ -47,11 +49,13 @@ export default class IconPickerHeader extends FormHeaderView {
 	 *   The object containing the category definitions.
 	 * @param {string[]} faStyles
 	 *   The enabled Font Awesome icon styles.
+	 * @param {string[]?} recommendedIcons
+	 *   The icons to display in the recommended category.
 	 * @returns {DropdownView}
 	 *   The category selection dropdown.
 	 */
-	_createCategoryDropdown(locale, faCategories, faStyles) {
-		const dropdownView = createDropdown(locale), items = createCategoryDropdownItems(locale, dropdownView, faCategories, faStyles), defaultLabel = 'Select a category', t = locale.t;
+	_createCategoryDropdown(locale, faCategories, faStyles, recommendedIcons) {
+		const dropdownView = createDropdown(locale), items = createCategoryDropdownItems(locale, dropdownView, faCategories, faStyles, recommendedIcons), defaultLabel = 'Select a category', t = locale.t;
 
 		dropdownView.buttonView.set({
 			label: t(defaultLabel),
@@ -60,6 +64,7 @@ export default class IconPickerHeader extends FormHeaderView {
 			class: 'ck-dropdown__button_label-width_auto'
 		});
 		dropdownView.buttonView.bind('label').to(this, 'categoryDefinition', value => t(value ? value.label : defaultLabel));
+		dropdownView.bind('value').to(this, 'categoryName');
 		dropdownView.on('execute', eventInfo => {
 			const categoryName = eventInfo.source.name;
 			dropdownView.set('value', categoryName);
@@ -77,19 +82,25 @@ export default class IconPickerHeader extends FormHeaderView {
  * @param {DropdownView} dropdownView 
  * @param {Object<string, CategoryDefinition>} faCategories
  * @param {string[]} faStyles
+ * @param {string[]?} recommendedIcons
  * @returns {Collection<ListDropdownItemDefinition>}
  *   The category dropdown view items collection.
  */
-function createCategoryDropdownItems(locale, dropdownView, faCategories, faStyles) {
-	const pinnedCategoryNames = ['all'];
+function createCategoryDropdownItems(locale, dropdownView, faCategories, faStyles, recommendedIcons) {
+	const pinnedCategoryNames = [];
 	/** @type {CategoryDefinition[]} */
 	const pinnedCategoryDefinitons = {
 		'all': { icons: [], label: 'All' },
 		'brands': { icons: [], label: 'Brands' }
 	};
 
+	if (recommendedIcons) {
+		pinnedCategoryNames.push('recommended');
+		pinnedCategoryDefinitons['recommended'] = { icons: recommendedIcons, label: 'Recommended' };
+	}
+	pinnedCategoryNames.push('all');
 	if(faStyles.includes('brands')) // Adds the "Brands" category if the brands style is accessible.
-		pinnedCategoryNames.push('brands')
+		pinnedCategoryNames.push('brands');
 
 	/** @type {Collection<ListDropdownItemDefinition>} */
 	const items = new Collection();

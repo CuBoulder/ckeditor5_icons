@@ -62,7 +62,7 @@ export default class IconPickerGrid extends View {
 				{
 					tag: 'div',
 					attributes: {
-						class: ['ck', 'ckeditor5-icons__grid-options']
+						class: ['ck', 'ckeditor5-icons__grid-options', this.expandButtonView.bindTemplate.to('isVisible', value => value ? '' : 'ck-hidden')]
 					},
 					children: [this.expandButtonView]
 				}
