@@ -42,20 +42,18 @@
 	font-size: var(--ck-icon-size);
 }
 
-.ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-options {
-	font-size: var(--ck-font-size-small);
-}
-
 .ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-options .ck.ckeditor5-icons__grid-expand {
 	display: block;
 	width: 100%;
 	text-align: center;
 	border-radius: 0;
+	padding: var(--ck-spacing-small) var(--ck-spacing-large);
 }
 
 .ck .ck.ckeditor5-icons__picker-footer {
 	display: flex;
 	justify-content: space-between;
+	align-items: center;
 	border-top: 1px solid var(--ck-color-base-border);
 	padding: var(--ck-spacing-small) var(--ck-spacing-large);
 }
@@ -67,9 +65,25 @@
 	text-overflow: ellipsis;
 }
 
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ckeditor5-icons__icon-info {
+	display: inline-flex;
+	flex-direction: column;
+}
+
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-form > *,
-.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5__picker-info > .ck.ckeditor5-icons__focused-label {
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5__picker-info > .ck.ckeditor5-icons__focused-label,
+.ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-options {
 	font-size: var(--ck-font-size-small);
+}
+
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon-info > .ck.ckeditor5-icons__icon-name {
+	font-size: var(--ck-font-size-small);
+	opacity: .6;
+}
+
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon-info > .ck.ckeditor5-icons__icon-label,
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon-info > .ck.ckeditor5-icons__icon-name {
+	line-height: 1.1em;
 }
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5__picker-info > .ck.ckeditor5-icons__library-attr {
@@ -81,6 +95,7 @@
 	display: none;
 }
 
+.ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-options .ck.ckeditor5-icons__grid-expand,
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__library-attr {
 	text-transform: uppercase;
 }
@@ -101,10 +116,6 @@
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon::after {
 	font-size: var(--ck-font-size-large);
-}
-
-.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ckeditor5-icons__icon-label {
-	display: inline-block;
 }
 
 /* Needed to fix CKEditor overriding Font Awesome styles */

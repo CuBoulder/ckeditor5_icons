@@ -25,11 +25,11 @@ export default class IconPickerItem extends ButtonView {
 	constructor(locale, faVersion, iconName, iconDefinition) {
 		super(locale);
 		
-		const bind = this.bindTemplate, label = locale.t(iconDefinition.label);
+		const bind = this.bindTemplate;
 	
 		this.set({
-			label:label,
-			class: ['ckeditor5-icons__grid-item'],
+			label:locale.t(iconDefinition.label),
+			class: 'ckeditor5-icons__grid-item',
 			isOn: false,
 			withText: true
 		});
@@ -47,7 +47,7 @@ export default class IconPickerItem extends ButtonView {
 
 		this.extendTemplate({
 			attributes: {
-				title: label
+				title: iconName
 			},
 			on: {
 				mouseover: bind.to('mouseover'),

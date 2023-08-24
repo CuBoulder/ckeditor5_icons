@@ -12,6 +12,7 @@ import { View } from 'ckeditor5/src/ui';
 import addKeyboardHandlingForGrid from '@ckeditor/ckeditor5-ui/src/bindings/addkeyboardhandlingforgrid';
 import IconPickerItem from './iconpickeritem';
 import { ButtonView } from "ckeditor5/src/ui";
+import { icons } from "ckeditor5/src/core";
 
 export default class IconPickerGrid extends View {
 	/**
@@ -25,6 +26,8 @@ export default class IconPickerGrid extends View {
 	constructor(locale, faVersion) {
 		super(locale);
 		this.faVersion = faVersion;
+
+		const t = this.locale.t;
 
 		this.items = this.createCollection();
 		this.sections = new Collection();
@@ -42,7 +45,8 @@ export default class IconPickerGrid extends View {
 
 		this.expandButtonView = new ButtonView(locale);
 		this.expandButtonView.set({
-			label: '',
+			icon: icons.plus,
+			label: t('Show More'),
 			withText: true,
 			isVisible: false,
 			class: 'ckeditor5-icons__grid-expand'
@@ -191,8 +195,6 @@ export default class IconPickerGrid extends View {
 		const buttonView = this.expandButtonView;
 		this.stopListening(buttonView, 'execute');
 		if (length > max) {
-			const t = this.locale.t;
-			buttonView.set('label', t('Expand') + ' (' + (length - max) + ')');
 			buttonView.set('isVisible', true);
 			this.listenTo(buttonView, 'execute', () => {
 				this.items.last.focus();

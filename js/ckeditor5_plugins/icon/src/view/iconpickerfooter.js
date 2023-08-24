@@ -24,7 +24,6 @@ export default class IconPickerFooter extends View {
 
 		const t = locale.t, bind = this.bindTemplate;
 
-		this.set('iconLabel', 'Select an icon');
 		this.set('focusedIconDefinition', null);
 
 		this.items = this.createCollection();
@@ -32,7 +31,7 @@ export default class IconPickerFooter extends View {
 		this._faIcon = null;
 		this.iconPreviewView = new View();
 		this.iconPreviewView.setTemplate({
-			tag: 'span',
+			tag: 'div',
 			attributes: {
 				class: ['ck', 'ckeditor5-icons__icon-preview']
 			}
@@ -52,16 +51,31 @@ export default class IconPickerFooter extends View {
 				{
 					tag: 'div',
 					attributes: {
-						class: ['ck', 'ckeditor5-icons__picker-preview']
+						class: ['ck', 'ckeditor5-icons__picker-preview', bind.to('iconName', value => value ? '' : 'ck-hidden')]
 					},
 					children: [
 						this.iconPreviewView,
 						{
-							tag: 'span',
+							tag: 'div',
 							attributes: {
-								class: ['ck', 'ckeditor5-icons__icon-label', bind.to('iconName', value => value ? '' : 'ck-hidden')]
+								class: ['ck', 'ckeditor5-icons__icon-info']
 							},
-							children: [{ text: bind.to('iconLabel', value => t(value)) }]
+							children: [
+								{
+									tag: 'span',
+									attributes: {
+										class: ['ck', 'ckeditor5-icons__icon-label']
+									},
+									children: [{ text: bind.to('iconDefinition', value => value ? t(value.label) : '') }]
+								},
+								{
+									tag: 'span',
+									attributes: {
+										class: ['ck', 'ckeditor5-icons__icon-name']
+									},
+									children: [{ text: bind.to('iconName') }]
+								}
+							]
 						}
 					]
 				},
@@ -99,10 +113,8 @@ export default class IconPickerFooter extends View {
 	 *   The enabled Font Awesome icon styles.
 	 */
 	refresh(faStyles) {
-		if (this.iconDefinition) {
-			this.set('iconLabel', this.iconDefinition.label);
+		if (this.iconDefinition)
 			this.formView.refresh(faStyles);
-		} else this.set('iconLabel', 'Select an icon');
 
 		const iconPreviewView = this.iconPreviewView;
 		let faIcon = null;
