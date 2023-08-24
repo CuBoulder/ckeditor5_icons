@@ -26,48 +26,41 @@ export default class IconPickerGrid extends View {
 		super(locale);
 		this.faVersion = faVersion;
 
-		this.tiles = this.createCollection();
+		this.items = this.createCollection();
 		this.sections = new Collection();
 
-		this.tilesView = new View();
-		this.tilesView.setTemplate({
+		this.itemsView = new View();
+		this.itemsView.setTemplate({
 			tag: 'div',
 			attributes: {
 				class: [
 					'ck',
-					'ckeditor5-icons__grid-tiles'
+					'ckeditor5-icons__grid-section'
 				]
 			}
 		});
 
-		this.showMoreButtonView = new ButtonView(locale);
-		this.showMoreButtonView.set({
+		this.expandButtonView = new ButtonView(locale);
+		this.expandButtonView.set({
 			label: '',
 			withText: true,
 			isVisible: false,
-			class: ['ck', 'ckeditor5-icons__grid-show-more']
+			class: 'ckeditor5-icons__grid-expand'
 		});
 
 		this.setTemplate({
 			tag: 'div',
 			attributes: {
-				class: [
-					'ck',
-					'ck-character-grid',
-					'ckeditor5-icons__grid'
-				]
+				class: ['ck', 'ckeditor5-icons__grid']
 			},
 			children: [
-				this.tilesView,
+				this.itemsView,
 				{
 					tag: 'div',
 					attributes: {
-						class: [
-							'ck',
-							'ckeditor5-icons__grid-options'
-						]
+						class: ['ck', 'ckeditor5-icons__grid-options']
 					},
-					children: [this.showMoreButtonView]
+					children: [this.expandButtonView]
 				}
 			]
 		});
@@ -80,9 +73,9 @@ export default class IconPickerGrid extends View {
 		addKeyboardHandlingForGrid({
 			keystrokeHandler: this.keystrokes,
 			focusTracker: this.focusTracker,
-			gridItems: this.tiles,
+			gridItems: this.items,
 			numberOfColumns: () => global.window
-				.getComputedStyle(this.tilesView.element.firstChild) // Responsive .ck-character-grid__tiles
+				.getComputedStyle(this.itemsView.element.firstChild) // Responsive .ck-character-grid__tiles
 				.getPropertyValue('grid-template-columns')
 				.split(' ')
 				.length,
@@ -99,24 +92,6 @@ export default class IconPickerGrid extends View {
 	_createItem(iconName, iconDefinition) {
 		const item = new IconPickerItem(this.locale, this.faVersion, iconName, iconDefinition), t = this.locale.t;
 
-		this.set('iconName', null);
-
-		item.set({
-			label: t(iconDefinition.label),
-			class: 'ck-character-grid__tile'
-		});
-
-		item.extendTemplate({
-			isOn: false,
-			attributes: {
-				title: t(iconDefinition.label)
-			},
-			on: {
-				mouseover: item.bindTemplate.to('mouseover'),
-				focus: item.bindTemplate.to('focus')
-			}
-		});
-
 		item.on('mouseover', () => this.fire('itemHover', iconName, iconDefinition));
 		item.on('focus', () => this.fire('itemFocus', iconName, iconDefinition));
 		item.on('execute', () => this.fire('execute', iconName, iconDefinition));
@@ -129,17 +104,28 @@ export default class IconPickerGrid extends View {
 	 * Refreshes this icon picker grid based on a category selection.
 	 * 
 	 * @param {CategoryDefinition} categoryDefinition
-	 * @param {Object<string, IconDefinition>} iconDefinition
+	 * @param {Object<string, IconDefinition>} iconDefinitions
 	 */
 	refresh(iconDefinitions) {
-		this.tiles.clear();
-	
+		/** @type {string} */
+		const categoryName = this.categoryName;
+
+		this.items.clear();
+
 		for (const section of this.sections)
-			this.tilesView.deregisterChild(section);
-		this.tilesView.element.innerText = '';
+			this.itemsView.deregisterChild(section);
+		this.itemsView.element.innerText = '';
 		this.sections.clear();
-	
-		this._populateGrid(this.categoryDefinition.icons, iconDefinitions);
+
+		/** @type {string[]} */
+		let iconNames;
+		if (categoryName === '_all')
+			iconNames = Object.keys(iconDefinitions);
+		else if (categoryName === '_brands')
+			iconNames = Object.keys(iconDefinitions).filter(value => iconDefinitions[value].styles.includes('brands'));
+		else iconNames = this.categoryDefinition.icons;
+
+		this._populateGrid(iconNames, iconDefinitions);
 	}
 
 	/**
@@ -148,10 +134,10 @@ export default class IconPickerGrid extends View {
 	render() {
 		super.render();
 
-		for (const item of this.tiles)
+		for (const item of this.items)
 			this.focusTracker.add(item.element);
 
-		this.tiles.on('change', (eventInfo, { added, removed }) => {
+		this.items.on('change', (eventInfo, { added, removed }) => {
 			if (added.length > 0) {
 				for (const item of added)
 					this.focusTracker.add(item.element);
@@ -180,40 +166,40 @@ export default class IconPickerGrid extends View {
 	 */
 	focus() {
 		if (this.iconName) {
-			const item = this.tiles.find(item => item.isOn);
+			const item = this.items.find(item => item.isOn);
 			if (item) {
 				item.focus();
 				return;
 			}
 		}
-		const first = this.tiles.first;
+		const first = this.items.first;
 		if (first)
 			first.focus();
 	}
 
 	_populateGrid(iconNames, iconDefinitions, startAt = 0) {
-		const max = 200, length = iconNames.length - startAt, section = new View(), sectionTiles = new Collection();
+		const max = 200, length = iconNames.length - startAt, section = new View(), sectionItems = new Collection();
 		for (let index = 0; index < Math.min(max, length); index++) {
 			const iconName = iconNames[startAt + index], iconDefinition = iconDefinitions[iconName];
 			if (iconDefinition) {
 				const item = this._createItem(iconName, iconDefinitions[iconName])
-				sectionTiles.add(item);
-				this.tiles.add(item);
+				sectionItems.add(item);
+				this.items.add(item);
 			}
 		}
 
-		const buttonView = this.showMoreButtonView;
+		const buttonView = this.expandButtonView;
+		this.stopListening(buttonView, 'execute');
 		if (length > max) {
 			const t = this.locale.t;
-			buttonView.set('label', t('Show more') + ' (' + (length - max) + ')');
+			buttonView.set('label', t('Expand') + ' (' + (length - max) + ')');
 			buttonView.set('isVisible', true);
 			this.listenTo(buttonView, 'execute', () => {
-				this.tiles.last.focus();
+				this.items.last.focus();
 				this._populateGrid(iconNames, iconDefinitions, startAt + max);
 			});
 			this.fire('showMorePossible', true);
 		} else {
-			this.stopListening(buttonView, 'execute');
 			this.fire('showMorePossible', false);
 			buttonView.set('isVisible', false);
 		}
@@ -221,13 +207,13 @@ export default class IconPickerGrid extends View {
 		section.setTemplate({
 			tag: 'div',
 			attributes: {
-				class: ['ck', 'ck-character-grid__tiles']
+				class: ['ck', 'ckeditor5-icons__grid-items']
 			},
-			children: sectionTiles
+			children: sectionItems
 		});
 
 		this.sections.add(section);
-		this.tilesView.registerChild(section);
-		this.tilesView.element.appendChild(section.element);
+		this.itemsView.registerChild(section);
+		this.itemsView.element.appendChild(section.element);
 	}
 }

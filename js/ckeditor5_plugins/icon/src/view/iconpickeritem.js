@@ -24,6 +24,15 @@ export default class IconPickerItem extends ButtonView {
 	 */
 	constructor(locale, faVersion, iconName, iconDefinition) {
 		super(locale);
+		
+		const bind = this.bindTemplate, label = locale.t(iconDefinition.label);
+	
+		this.set({
+			label:label,
+			class: ['ckeditor5-icons__grid-item'],
+			isOn: false,
+			withText: true
+		});
 
 		this._faIcon = new IconPickerFAIcon(locale, faVersion, iconName, iconDefinition);
 		this._faIcon.extendTemplate({
@@ -33,6 +42,16 @@ export default class IconPickerItem extends ButtonView {
 					'ck-button__icon',
 					'ck-icon_inherit-color'
 				]
+			}
+		});
+
+		this.extendTemplate({
+			attributes: {
+				title: label
+			},
+			on: {
+				mouseover: bind.to('mouseover'),
+				focus: bind.to('focus')
 			}
 		});
 

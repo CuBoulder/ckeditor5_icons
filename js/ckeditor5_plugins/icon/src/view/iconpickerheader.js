@@ -18,11 +18,13 @@ export default class IconPickerHeader extends FormHeaderView {
 	 *   The locale.
 	 * @param {Object<string, CategoryDefinition>} faCategories
 	 *   The Font Awesome category definitions.
+	 * @param {string[]} faStyles
+	 *   The enabled Font Awesome icon styles.
 	 */
-	constructor(locale, faCategories) {
+	constructor(locale, faCategories, faStyles) {
 		super(locale);
 
-		this.categoryDropdownView = this._createCategoryDropdown(locale, faCategories);
+		this.categoryDropdownView = this._createCategoryDropdown(locale, faCategories, faStyles);
 		this.categoryDropdownView.panelPosition = locale.uiLanguageDirection === 'rtl' ? 'se' : 'sw';
 
 		this.label = locale.t('Icons');
@@ -41,13 +43,15 @@ export default class IconPickerHeader extends FormHeaderView {
 	/**
 	 * @param {Locale} locale
 	 *   The locale.
-	 * @param {Object<string, CategoryDefinition>} categories
+	 * @param {Object<string, CategoryDefinition>} faCategories
 	 *   The object containing the category definitions.
+	 * @param {string[]} faStyles
+	 *   The enabled Font Awesome icon styles.
 	 * @returns {DropdownView}
 	 *   The category selection dropdown.
 	 */
-	_createCategoryDropdown(locale, faCategories) {
-		const dropdownView = createDropdown(locale), items = createCategoryDropdownItems(locale, dropdownView, faCategories), defaultLabel = 'Select a category', t = locale.t;
+	_createCategoryDropdown(locale, faCategories, faStyles) {
+		const dropdownView = createDropdown(locale), items = createCategoryDropdownItems(locale, dropdownView, faCategories, faStyles), defaultLabel = 'Select a category', t = locale.t;
 
 		dropdownView.buttonView.set({
 			label: t(defaultLabel),
@@ -56,7 +60,7 @@ export default class IconPickerHeader extends FormHeaderView {
 			class: 'ck-dropdown__button_label-width_auto'
 		});
 		dropdownView.buttonView.bind('label').to(this, 'categoryDefinition', value => t(value ? value.label : defaultLabel));
-		dropdownView.on('execute', eventInfo => { 
+		dropdownView.on('execute', eventInfo => {
 			const categoryName = eventInfo.source.name;
 			dropdownView.set('value', categoryName);
 			this.fire('execute', categoryName, faCategories[categoryName]);
@@ -70,27 +74,58 @@ export default class IconPickerHeader extends FormHeaderView {
 
 /**
  * @param {Locale} locale
- *   The locale.
  * @param {DropdownView} dropdownView 
- *   The dropdown view.
  * @param {Object<string, CategoryDefinition>} faCategories
- *   The Font Awesome category definitions.
+ * @param {string[]} faStyles
  * @returns {Collection<ListDropdownItemDefinition>}
- *   The opts for the dropdown view.
+ *   The category dropdown view items collection.
  */
-function createCategoryDropdownItems(locale, dropdownView, faCategories) {
+function createCategoryDropdownItems(locale, dropdownView, faCategories, faStyles) {
+	const pinnedCategoryNames = ['all'];
+	/** @type {CategoryDefinition[]} */
+	const pinnedCategoryDefinitons = {
+		'all': { icons: [], label: 'All' },
+		'brands': { icons: [], label: 'Brands' }
+	};
+
+	if(faStyles.includes('brands')) // Adds the "Brands" category if the brands style is accessible.
+		pinnedCategoryNames.push('brands')
+
 	/** @type {Collection<ListDropdownItemDefinition>} */
 	const items = new Collection();
 
-	for (const [name, definition] of Object.entries(faCategories)) {
-		const model = new Model({
-			name,
-			label: locale.t(definition.label),
-			withText: true
-		});
-		model.bind('isOn').to(dropdownView, 'value', value => value === name);
-		items.add({ type: 'button', model });
+	const categoryEntries = Object.entries(faCategories);
+
+	for (const categoryName of pinnedCategoryNames) {
+		const categoryDefinition = pinnedCategoryDefinitons[categoryName], categoryNameEscaped = '_' + categoryName;
+		addCategoryDropdownItem(locale, dropdownView, items, categoryNameEscaped, pinnedCategoryDefinitons[categoryName]);
+		if (!faCategories[categoryNameEscaped])
+			faCategories[categoryNameEscaped] = categoryDefinition;
+	}
+	items.add({ type: 'separator' });
+	for (const [categoryName, categoryDefinition] of categoryEntries) {
+		if ('_' !== categoryName[0])
+			addCategoryDropdownItem(locale, dropdownView, items, categoryName, categoryDefinition);
 	}
 
 	return items;
+}
+
+/**
+ * Adds a new item to the category dropdown view items collection.
+ * 
+ * @param {Locale} locale
+ * @param {DropdownView} dropdownView 
+ * @param {Collection<ListDropdownItemDefinition>} items 
+ * @param {string} categoryName 
+ * @param {CategoryDefinition} categoryDefinition 
+ */
+function addCategoryDropdownItem(locale, dropdownView, items, categoryName, categoryDefinition) {
+	const model = new Model({
+		name: categoryName,
+		label: locale.t(categoryDefinition.label),
+		withText: true
+	});
+	model.bind('isOn').to(dropdownView, 'value', value => value === categoryName);
+	items.add({ type: 'button', model });
 }

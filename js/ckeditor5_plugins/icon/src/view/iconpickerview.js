@@ -37,7 +37,7 @@ export default class IconPickerView extends View {
 		this.set('iconStyle', faStyles[0]);
 		this.set('iconDefinition', null);
 
-		const headerView = this.headerView = new IconPickerHeader(locale, faCategories);
+		const headerView = this.headerView = new IconPickerHeader(locale, faCategories, faStyles);
 		const gridView = this.gridView = new IconPickerGrid(locale, faVersion);
 		const footerView = this.footerView = new IconPickerFooter(locale, faVersion);
 
@@ -104,8 +104,8 @@ export default class IconPickerView extends View {
 		// Tracks the "Show more" button in the grid view.
 		this.listenTo(gridView, 'showMorePossible', (eventInfo, value) => {
 			if (value)
-				this._startTracking(gridView.showMoreButtonView);
-			else this._stopTracking(gridView.showMoreButtonView);
+				this._startTracking(gridView.expandButtonView);
+			else this._stopTracking(gridView.expandButtonView);
 		});
 
 		// Handles the icon style change event.

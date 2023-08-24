@@ -7,33 +7,68 @@
 	overflow-y: auto;
 }
 
-.ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-options {
-	text-align: center;
+.ck .ck.ckeditor5-icons__grid {
+	min-width: 350px;
+	max-height: 200px;
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 
-.ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-options > * {
-	margin: var(--ck-spacing-standard);
+.ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-items {
+	display: grid;
+	grid-gap: var(--ck-spacing-standard);
+	grid-template-columns: repeat(2,1fr);
+	margin: var(--ck-spacing-standard) var(--ck-spacing-large);
+}
+
+.ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-items  .ck.ckeditor5-icons__grid-item .ck.ck-button__label {
+	display: block;
+	width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	padding-left: var(--ck-icon-size);
+}
+
+.ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-items  .ck.ckeditor5-icons__grid-item .ck.ckeditor5-icons__icon {
+	position: absolute;
+	display: block;
+	width: var(--ck-icon-size);
+	height: var(--ck-icon-size);
+	text-align: center;
+	padding-left: var(--ck-spacing-standard);
+}
+
+.ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-items  .ck.ckeditor5-icons__grid-item .ck.ckeditor5-icons__icon::after {
+	font-size: var(--ck-icon-size);
+}
+
+.ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-options {
+	font-size: var(--ck-font-size-small);
+}
+
+.ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-options .ck.ckeditor5-icons__grid-expand {
+	display: block;
+	width: 100%;
+	text-align: center;
+	border-radius: 0;
 }
 
 .ck .ck.ckeditor5-icons__picker-footer {
 	display: flex;
 	justify-content: space-between;
-	align-items: baseline;
 	border-top: 1px solid var(--ck-color-base-border);
 	padding: var(--ck-spacing-small) var(--ck-spacing-large);
 }
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5__picker-info,
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5__picker-info > * {
-	/* max-width: 128px; */
 	overflow: hidden;
 	text-align: right;
 	text-overflow: ellipsis;
 }
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-form > *,
-.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5__picker-info > .ck.ckeditor5-icons__focused-label,
-.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview > .ck.ckeditor5-icons__icon-label {
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5__picker-info > .ck.ckeditor5-icons__focused-label {
 	font-size: var(--ck-font-size-small);
 }
 
@@ -42,20 +77,34 @@
 	opacity: .6;
 }
 
-.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__library-attr,
-.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5__picker-info > .ck.ckeditor5-icons__focused-label,
-.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview > .ck.ckeditor5-icons__icon-label {
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5__picker-info > .ck.ckeditor5-icons__focused-label {
+	display: none;
+}
+
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__library-attr {
 	text-transform: uppercase;
 }
 
-.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon-preview .ck.ckeditor5-icons__icon {
-	font-size: var(--ck-font-size-large);
-	margin-right: .3em;
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
 }
 
-.ck svg.ck.ckeditor5-icons__icon,
-.ck .ck.ckeditor5-icons__icon svg {
-	height: 1em;
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon {
+	display: inline-block;
+	width: var(--ck-font-size-large);
+	height: var(--ck-font-size-large);
+	text-align: center;
+	margin-right: var(--ck-spacing-small);
+}
+
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon::after {
+	font-size: var(--ck-font-size-large);
+}
+
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ckeditor5-icons__icon-label {
+	display: inline-block;
 }
 
 /* Needed to fix CKEditor overriding Font Awesome styles */
