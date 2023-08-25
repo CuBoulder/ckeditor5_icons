@@ -66,7 +66,8 @@ class CKEditor5IconsManager implements CKEditor5IconsManagerInterface {
 		$faIcons = array_map(function($icon) {
 			return [
 				'styles' => $icon['styles'],
-				'label' => $icon['label']
+				'label' => $icon['label'],
+				'search' => $icon['search']
 			];
 		}, Yaml::parseFile($this->extensionPathResolver->getPath('module', 'ckeditor5_icons') . '/libraries/fontawesome' . $faVersion . '/metadata/icons.yml'));
 		$this->dataCache->set($cacheId, $faIcons);

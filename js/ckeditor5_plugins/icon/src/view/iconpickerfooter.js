@@ -8,6 +8,7 @@
 import { View } from 'ckeditor5/src/ui';
 import IconPickerFAIcon from './iconpickerfaicon';
 import IconPickerForm from './iconpickerform';
+import IconPickerSearch from './iconpickersearch';
 
 export default class IconPickerFooter extends View {
 	/**
@@ -24,9 +25,8 @@ export default class IconPickerFooter extends View {
 
 		const t = locale.t, bind = this.bindTemplate;
 
-		this.set('focusedIconDefinition', null);
-
-		this.items = this.createCollection();
+		this.searchView = new IconPickerSearch(locale);
+		this.searchView.delegate('search').to(this);
 
 		this._faIcon = null;
 		this.iconPreviewView = new View();
@@ -51,47 +51,50 @@ export default class IconPickerFooter extends View {
 				{
 					tag: 'div',
 					attributes: {
-						class: ['ck', 'ckeditor5-icons__picker-preview', bind.to('iconName', value => value ? '' : 'ck-hidden')]
+						class: ['ck', 'ckeditor5-icons__footer-flex', bind.to('iconName', value => value ? '' : 'ck-hidden')]
 					},
 					children: [
-						this.iconPreviewView,
 						{
 							tag: 'div',
 							attributes: {
-								class: ['ck', 'ckeditor5-icons__icon-info']
+								class: ['ck', 'ckeditor5-icons__picker-preview']
 							},
 							children: [
+								this.iconPreviewView,
 								{
-									tag: 'span',
+									tag: 'div',
 									attributes: {
-										class: ['ck', 'ckeditor5-icons__icon-label']
+										class: ['ck', 'ckeditor5-icons__icon-info']
 									},
-									children: [{ text: bind.to('iconDefinition', value => value ? t(value.label) : '') }]
-								},
-								{
-									tag: 'span',
-									attributes: {
-										class: ['ck', 'ckeditor5-icons__icon-name']
-									},
-									children: [{ text: bind.to('iconName') }]
+									children: [
+										{
+											tag: 'span',
+											attributes: {
+												class: ['ck', 'ckeditor5-icons__icon-label']
+											},
+											children: [{ text: bind.to('iconDefinition', value => value ? t(value.label) : '') }]
+										},
+										{
+											tag: 'span',
+											attributes: {
+												class: ['ck', 'ckeditor5-icons__icon-name']
+											},
+											children: [{ text: bind.to('iconName') }]
+										}
+									]
 								}
 							]
-						}
+						},
+						this.formView
 					]
 				},
 				{
 					tag: 'div',
 					attributes: {
-						class: ['ck', 'ckeditor5__picker-info', bind.to('iconName', value => value ? 'ck-hidden' : '')]
+						class: ['ck', 'ckeditor5-icons__footer-flex', bind.to('iconName', value => value ? 'ck-hidden' : '')]
 					},
 					children: [
-						{
-							tag: 'div',
-							attributes: {
-								class: ['ck', 'ckeditor5-icons__focused-label']
-							},
-							children: [{ text: bind.to('focusedIconDefinition', value => value ? t(value.label) : t('Select an icon')) }]
-						},
+						this.searchView,
 						{
 							tag: 'div',
 							attributes: {
@@ -100,8 +103,7 @@ export default class IconPickerFooter extends View {
 							children: [{ text: faVersion === '5' ? 'Font Awesome 5' : 'Font Awesome 6' }]
 						}
 					]
-				},
-				this.formView
+				}
 			]
 		});
 	}

@@ -96,7 +96,7 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 		$form['recommended_icons'] = [
 			'#type' => 'textfield',
 			'#title' => $this->t('Recommended icons'),
-			'#description' => $this->t('Comma-separated icon names to display in the Recommended category. For a complete list of icons names visit <a target="_blank" href="@fa_url">Font Awesome\'s website</a>.', ['@fa_url' => 'https://fontawesome.com/search?m=free']),
+			'#description' => $this->t('Comma-separated icon names to display in the Recommended category. For a complete list of icon names visit <a target="_blank" href="@fa_url">Font Awesome\'s website</a>.', ['@fa_url' => 'https://fontawesome.com/search?m=free']),
 			'#default_value' => implode(',', $this->configuration['recommended_icons'])
 		];
 		return $form;
@@ -107,12 +107,10 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 	 */
 	public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
 		$form_state->setValue('fa_version', $this->manager->toValidFAVersion($form_state->getValue('fa_version')));
-		$form_state->setValue('recommended_enabled', $form_state->getValue('recommended_enabled') ? true : false);
+		$form_state->setValue('recommended_enabled', (bool) $form_state->getValue('recommended_enabled'));
 		$form_state->setValue('recommended_icons', array_filter(array_map(function($value) {
 				return preg_replace('/([^a-z0-9\-]+)/', '', strtolower($value));
-			}, explode(',', $form_state->getValue('recommended_icons'))), function($value) {
-				return (bool) $value;
-			}));
+			}, explode(',', $form_state->getValue('recommended_icons')))));
 	}
 
 	/**

@@ -21,7 +21,7 @@
 	margin: var(--ck-spacing-standard) var(--ck-spacing-large);
 }
 
-.ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-items  .ck.ckeditor5-icons__grid-item .ck.ck-button__label {
+.ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-items .ck.ckeditor5-icons__grid-item .ck.ck-button__label {
 	display: block;
 	width: 100%;
 	overflow: hidden;
@@ -29,7 +29,7 @@
 	padding-left: var(--ck-icon-size);
 }
 
-.ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-items  .ck.ckeditor5-icons__grid-item .ck.ckeditor5-icons__icon {
+.ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-items .ck.ckeditor5-icons__grid-item .ck.ckeditor5-icons__icon {
 	position: absolute;
 	display: block;
 	width: var(--ck-icon-size);
@@ -38,7 +38,7 @@
 	padding-left: var(--ck-spacing-standard);
 }
 
-.ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-items  .ck.ckeditor5-icons__grid-item .ck.ckeditor5-icons__icon::after {
+.ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-items .ck.ckeditor5-icons__grid-item .ck.ckeditor5-icons__icon::after {
 	font-size: var(--ck-icon-size);
 }
 
@@ -50,22 +50,14 @@
 	display: block;
 	width: 100%;
 	text-align: center;
-	padding: var(--ck-spacing-small) var(--ck-spacing-large);
 }
 
-.ck .ck.ckeditor5-icons__picker-footer {
+.ck .ck.ckeditor5-icons__picker-footer .ckeditor5-icons__footer-flex {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	border-top: 1px solid var(--ck-color-base-border);
 	padding: var(--ck-spacing-small) var(--ck-spacing-large);
-}
-
-.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5__picker-info,
-.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5__picker-info > * {
-	overflow: hidden;
-	text-align: right;
-	text-overflow: ellipsis;
 }
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ckeditor5-icons__icon-info {
@@ -74,28 +66,23 @@
 }
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-form > *,
-.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5__picker-info > .ck.ckeditor5-icons__focused-label,
-.ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-options {
+.ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-options,
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon-info > .ck.ckeditor5-icons__icon-name {
 	font-size: var(--ck-font-size-small);
 }
 
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__footer-flex > .ck.ckeditor5-icons__library-attr {
+	font-size: var(--ck-font-size-tiny);
+}
+
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__footer-flex > .ck.ckeditor5-icons__library-attr,
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon-info > .ck.ckeditor5-icons__icon-name {
-	font-size: var(--ck-font-size-small);
 	opacity: .6;
 }
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon-info > .ck.ckeditor5-icons__icon-label,
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon-info > .ck.ckeditor5-icons__icon-name {
 	line-height: 1.1em;
-}
-
-.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5__picker-info > .ck.ckeditor5-icons__library-attr {
-	font-size: var(--ck-font-size-tiny);
-	opacity: .6;
-}
-
-.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5__picker-info > .ck.ckeditor5-icons__focused-label {
-	display: none;
 }
 
 .ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-options .ck.ckeditor5-icons__grid-expand,

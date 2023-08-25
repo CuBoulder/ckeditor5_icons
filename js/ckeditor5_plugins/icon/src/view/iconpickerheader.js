@@ -26,6 +26,9 @@ export default class IconPickerHeader extends FormHeaderView {
 	constructor(locale, faCategories, faStyles, recommendedIcons) {
 		super(locale);
 
+		this.set('categoryName', null);
+		this.set('categoryDefinition', null);
+
 		this.categoryDropdownView = this._createCategoryDropdown(locale, faCategories, faStyles, recommendedIcons);
 		this.categoryDropdownView.panelPosition = locale.uiLanguageDirection === 'rtl' ? 'se' : 'sw';
 
@@ -33,6 +36,11 @@ export default class IconPickerHeader extends FormHeaderView {
 		this.class = 'ckeditor5-icons__picker-header';
 
 		this.children.add(this.categoryDropdownView);
+
+		this.on('execute', (eventInfo, categoryName, categoryDefinition) => {
+			this.set('categoryName', categoryName);
+			this.set('categoryDefinition', categoryDefinition);	
+		});
 	}
 
 	/**

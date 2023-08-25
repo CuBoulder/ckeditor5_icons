@@ -40,7 +40,7 @@ export default class IconPickerForm extends View {
 		this.setTemplate({
 			tag: 'form',
 			attributes: {
-				class: ['ck', 'ckeditor5-icons__picker-form', bind.to('iconName', value => value ? '' : 'ck-hidden')]
+				class: ['ck', 'ckeditor5-icons__picker-form']
 			},
 			children: [this.styleDropdownView, this.submitButtonView, this.cancelButtonView]
 		});

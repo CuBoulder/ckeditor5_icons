@@ -3,7 +3,7 @@
  * 
  * @typedef { '5' | '6' } FontAwesomeVersion
  * @typedef { { 'icons': string[], 'label': string } } CategoryDefinition
- * @typedef { { 'styles': string[], 'label': string } } IconDefinition
+ * @typedef { { 'styles': string[], 'label': string, 'search': { 'terms': string[] } } } IconDefinition
  * 
  * @typedef {Object} SelectableOption
  * @property {string} label

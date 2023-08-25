@@ -36,17 +36,15 @@ export default class IconPickerGrid extends View {
 		this.itemsView.setTemplate({
 			tag: 'div',
 			attributes: {
-				class: [
-					'ck',
-					'ckeditor5-icons__grid-section'
-				]
+				class: ['ck', 'ckeditor5-icons__grid-section']
 			}
 		});
 
 		this.expandButtonView = new ButtonView(locale);
 		this.expandButtonView.set({
 			icon: icons.plus,
-			label: t('Show More'),
+			label: t('Show more'),
+			tooltip: t('Show more icons'),
 			withText: true,
 			isVisible: false,
 			class: 'ckeditor5-icons__grid-expand'
@@ -107,17 +105,14 @@ export default class IconPickerGrid extends View {
 	/**
 	 * Refreshes this icon picker grid based on a category selection.
 	 * 
+	 * @param {string} categoryName
 	 * @param {CategoryDefinition} categoryDefinition
 	 * @param {Object<string, IconDefinition>} iconDefinitions
+	 * @param {string?} searchQuery
 	 */
-	refresh(iconDefinitions) {
-		/** @type {string} */
-		const categoryName = this.categoryName;
-
+	refresh(categoryName, categoryDefinition, iconDefinitions, searchQuery) {
 		this.items.clear();
-
-		for (const section of this.sections)
-			this.itemsView.deregisterChild(section);
+		this.itemsView.deregisterChild(this.sections);
 		this.itemsView.element.innerText = '';
 		this.sections.clear();
 
@@ -127,7 +122,10 @@ export default class IconPickerGrid extends View {
 			iconNames = Object.keys(iconDefinitions);
 		else if (categoryName === '_brands')
 			iconNames = Object.keys(iconDefinitions).filter(value => iconDefinitions[value].styles.includes('brands'));
-		else iconNames = this.categoryDefinition.icons;
+		else iconNames = categoryDefinition.icons;
+
+		if (searchQuery)
+			iconNames = searchResults(iconNames, iconDefinitions, searchQuery);
 
 		this._populateGrid(iconNames, iconDefinitions);
 	}
@@ -181,8 +179,16 @@ export default class IconPickerGrid extends View {
 			first.focus();
 	}
 
+	/**
+	 * Populates the icon grid.
+	 * 
+	 * @param {string[]} iconNames
+	 * @param {Object<string, IconDefinition>} iconDefinitions
+	 * @param {number} startAt
+	 */
 	_populateGrid(iconNames, iconDefinitions, startAt = 0) {
 		const max = 200, length = iconNames.length - startAt, section = new View(), sectionItems = new Collection();
+
 		for (let index = 0; index < Math.min(max, length); index++) {
 			const iconName = iconNames[startAt + index], iconDefinition = iconDefinitions[iconName];
 			if (iconDefinition) {
@@ -200,9 +206,9 @@ export default class IconPickerGrid extends View {
 				this.items.last.focus();
 				this._populateGrid(iconNames, iconDefinitions, startAt + max);
 			});
-			this.fire('showMorePossible', true);
+			this.fire('expandPossible', true);
 		} else {
-			this.fire('showMorePossible', false);
+			this.fire('expandPossible', false);
 			buttonView.set('isVisible', false);
 		}
 
@@ -218,4 +224,40 @@ export default class IconPickerGrid extends View {
 		this.itemsView.registerChild(section);
 		this.itemsView.element.appendChild(section.element);
 	}
+}
+
+
+/**
+ * @param {string[]} iconNames
+ * @param {Object<string, IconDefinition>} iconDefinitions
+ * @param {string} searchQuery
+ * @returns {string[]}
+ *   The filtered search results.
+ */
+function searchResults(iconNames, iconDefinitions, searchQuery) {
+	if (searchQuery.length > 3 && searchQuery.substr(0, 3) === 'fa-') // Strips `fa-` prefix.
+		searchQuery = searchQuery.substr(3);
+
+	const orderedResults = [], resultSet = new Set();
+
+	if (iconNames.includes(searchQuery)) { // First pass: checks exact match of icon name.
+		orderedResults.push(searchQuery);
+		resultSet.add(searchQuery);
+	}
+
+	for (const iconName of iconNames) { // Second pass: checks exact match of keywords.
+		if (iconName !== searchQuery && iconDefinitions[iconName].search.terms.includes(searchQuery)) {
+			orderedResults.push(iconName);
+			resultSet.add(iconName);
+		}
+	}
+
+	for (const iconName of iconNames) { // Third pass: checks icon name starts with.
+		if (!resultSet.has(iconName) && iconName.indexOf(searchQuery) === 0) {
+			orderedResults.push(iconName);
+			resultSet.add(iconName);
+		}
+	}
+
+	return orderedResults;
 }

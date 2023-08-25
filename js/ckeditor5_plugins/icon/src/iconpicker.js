@@ -59,8 +59,8 @@ export default class IconPicker extends Plugin {
 			dropdownView.on('change:isOpen', () => {
 				if (!iconPickerView) {
 					iconPickerView = new IconPickerView(locale, faVersion, faCategories, faIcons, styles, recommendedIcons);
-					this.listenTo(iconPickerView, 'execute', eventInfo => { // Inserts the icon when the icon picker view fires the `execute` event.
-						const { iconName, iconStyle } = eventInfo.source;
+					this.listenTo(iconPickerView, 'execute', () => { // Inserts the icon when the icon picker view fires the `execute` event.
+						const { iconName, iconStyle } = iconPickerView;
 						command.execute({ iconClass: getFAStyleClass(faVersion, iconStyle) + ' fa-' + iconName });
 					});
 					dropdownView.panelView.children.add(iconPickerView);
