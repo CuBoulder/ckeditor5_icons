@@ -69,18 +69,30 @@
 	padding: var(--ck-spacing-small) var(--ck-spacing-large);
 }
 
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-search {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	grid-gap: var(--ck-spacing-tiny);
+}
+
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ckeditor5-icons__icon-info {
 	display: inline-flex;
 	flex-direction: column;
 }
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-form > *,
-.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon-info > .ck.ckeditor5-icons__icon-name {
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon-info > .ck.ckeditor5-icons__icon-name,
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-search > .ck.ck-button {
 	font-size: var(--ck-font-size-small);
 }
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__footer-flex > .ck.ckeditor5-icons__library-attr {
 	font-size: var(--ck-font-size-tiny);
+}
+
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-search > .ck.ck-button {
+	height: 1em;
 }
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__footer-flex > .ck.ckeditor5-icons__library-attr,

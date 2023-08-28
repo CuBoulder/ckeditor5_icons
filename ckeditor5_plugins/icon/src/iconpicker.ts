@@ -50,8 +50,7 @@ export default class IconPicker extends Plugin implements PluginInterface {
 						command.execute({ iconClass: getFAStyleClass(faVersion, iconStyle) + ' fa-' + iconName });
 					});
 					dropdownView.panelView.children.add(iconPickerView);
-				} else if (!dropdownView.isOpen && iconPickerView.iconName)
-					iconPickerView.fire('cancel');
+				}
 			});
 
 			return dropdownView;

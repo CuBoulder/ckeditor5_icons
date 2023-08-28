@@ -9,6 +9,7 @@ import { icons } from 'ckeditor5/src/core';
 import { Collection } from 'ckeditor5/src/utils';
 import { faStyleLabels } from '../iconconfig';
 import type { FontAwesomeStyle, IconDefinition, IconName } from '../icontypes';
+import { createButton } from './iconviewutils';
 
 export default class IconPickerForm extends View {
 	/**
@@ -139,34 +140,6 @@ export default class IconPickerForm extends View {
 
 		return dropdownView;
 	}
-}
-
-/**
- * @param locale
- *   The locale.
- * @param label
- *   The button's label.
- * @param icon
- *   The button's icon (optional).
- * @param  className
- *   The button's class (optional).
- * @param withText
- *   Set to force text display even if the button has an icon.
- * @returns
- *   A button with the specified parameters.
- */
-function createButton(label: string, icon?: string | null, className?: string | null, withText?: boolean | string | null): ButtonView {
-	const button = new ButtonView();
-
-	button.set({
-		label: typeof withText === 'string' ? withText : label,
-		icon,
-		tooltip: icon ? label : false,
-		withText: withText || !icon,
-		class: className
-	});
-
-	return button;
 }
 
 /**

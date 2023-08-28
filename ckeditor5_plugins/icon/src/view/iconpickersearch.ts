@@ -3,13 +3,22 @@
  */
 
 import type { Locale } from 'ckeditor5/src/utils';
+import type { ButtonView, InputTextView, ButtonExecuteEvent } from 'ckeditor5/src/ui';
 import { createLabeledInputText, LabeledFieldView, View } from 'ckeditor5/src/ui';
+import type { InputViewInputEvent } from '@ckeditor/ckeditor5-ui/src/input/inputview';
+import { createButton } from './iconviewutils';
+import { icons } from 'ckeditor5/src/core';
 
 export default class IconPickerSearch extends View {
 	/**
 	 * The labeled search field view.
 	 */
-	public readonly searchFieldView: LabeledFieldView;
+	public readonly searchFieldView: LabeledFieldView<InputTextView>;
+
+	/**
+	 * The clear button view – clears the search when pressed.
+	 */
+	public readonly clearButtonView: ButtonView;
 
 	/**
 	 * Constructs a new IconPickerSearch.
@@ -25,11 +34,21 @@ export default class IconPickerSearch extends View {
 
 		this.searchFieldView = new LabeledFieldView(locale, createLabeledInputText);
 		this.searchFieldView.label = t('Search all icons');
-		this.searchFieldView.fieldView.on('input', eventInfo => {
-			const value = ((eventInfo.source as View).element as HTMLInputElement).value;
+		this.searchFieldView.fieldView.on<InputViewInputEvent>('input', () => {
+			const value = this.searchFieldView.fieldView.element?.value;
 			if (delayTimer)
 				clearTimeout(delayTimer);
 			delayTimer = setTimeout(() => this.fire<SearchEvent>('search', value), delayms);
+			this.searchFieldView.fieldView.set('value', value);
+		});
+		this.clearButtonView = createButton(t('Clear search'), icons.cancel, 'ck-button-cancel');
+		this.clearButtonView.isVisible = false;
+		this.clearButtonView.on<ButtonExecuteEvent>('execute', () => {
+			if (delayTimer)
+				clearTimeout(delayTimer);
+			this.fire<SearchEvent>('search');
+			this.searchFieldView.fieldView.set('value', '');
+			this.searchFieldView.focus();
 		});
 
 		this.setTemplate({
@@ -37,7 +56,7 @@ export default class IconPickerSearch extends View {
 			attributes: {
 				class: ['ck', 'ckeditor5-icons__picker-search']
 			},
-			children: [this.searchFieldView]
+			children: [this.searchFieldView, this.clearButtonView]
 		});
 	}
 }
@@ -47,5 +66,13 @@ export default class IconPickerSearch extends View {
  */
 export type SearchEvent = {
 	name: 'search';
-	args: [queryString: string];
+	args: [queryString?: string];
+};
+
+/**
+ * The event fired when a search change is performed.
+ */
+export type SearchClearEvent = {
+	name: 'searchClear';
+	args: [];
 };

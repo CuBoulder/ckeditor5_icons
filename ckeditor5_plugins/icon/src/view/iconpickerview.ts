@@ -2,7 +2,7 @@
  * @file contains the icon picker root view.
  */
 
-import type { ViewCollection, FocusableView } from 'ckeditor5/src/ui';
+import type { ViewCollection, FocusableView, ButtonExecuteEvent } from 'ckeditor5/src/ui';
 import { View, FocusCycler } from 'ckeditor5/src/ui';
 import type { Locale } from 'ckeditor5/src/utils';
 import { FocusTracker, KeystrokeHandler } from 'ckeditor5/src/utils';
@@ -100,6 +100,7 @@ export default class IconPickerView extends View implements FocusableView {
 		this.gridView = new IconPickerGrid(locale, faVersion);
 		this.footerView = new IconPickerFooter(locale, faVersion);
 		this.searchFieldView = this.footerView.searchView.searchFieldView.fieldView;
+		const searchClearButtonView = this.footerView.searchView.clearButtonView;
 
 		this.items = this.createCollection();
 		this.focusTracker = new FocusTracker();
@@ -166,9 +167,15 @@ export default class IconPickerView extends View implements FocusableView {
 			if (searchQuery) {
 				this.gridView.refresh('_all', faCategories['_all']!, faIcons, searchQuery);
 				this.headerView.categoryDropdownView.buttonView.set('isVisible', false);
+				this._stopTracking(this.headerView);
+				searchClearButtonView.isVisible = true;
+				this._startTracking(searchClearButtonView);
 			} else {
 				this.gridView.refresh(this.headerView.categoryName || '_all', this.headerView.categoryDefinition || faCategories['_all']!, faIcons);
 				this.headerView.categoryDropdownView.buttonView.set('isVisible', true);
+				this._startTracking(this.headerView, 0);
+				searchClearButtonView.isVisible = false;
+				this._stopTracking(searchClearButtonView);
 			}
 		});
 
@@ -185,7 +192,10 @@ export default class IconPickerView extends View implements FocusableView {
 		// If an icon is not selected or Escape is pressed twice, the default behavior is to close the icon picker.
 		this.keystrokes.set('Esc', (_data, cancel) => {
 			if (this.iconName) {
-				this.fire('cancel');
+				this._clearSelectedIcon(true);
+				cancel();
+			} else if (this.items.has(searchClearButtonView)) {
+				searchClearButtonView.fire<ButtonExecuteEvent>('execute'); // Escape key mimics a press of "Clear search".
 				cancel();
 			}
 		});
