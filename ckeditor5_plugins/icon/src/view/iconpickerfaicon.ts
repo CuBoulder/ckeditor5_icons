@@ -1,30 +1,28 @@
 /**
  * @file contains the icon picker icon for FontAwesome icons.
- * 
- * @typedef { import('../iconconfig').FontAwesomeVersion } FontAwesomeVersion
- * @typedef { import('../iconconfig').IconDefinition } IconDefinition
- * @typedef { import('@types/ckeditor__ckeditor5-utils').Locale } Locale
  */
 
+import type { Locale } from 'ckeditor5/src/utils';
 import { View } from 'ckeditor5/src/ui';
 import { getFAStyleClass, getValidIconStyle } from '../iconutils';
+import type { FontAwesomeStyle, FontAwesomeVersion, IconDefinition, IconName } from '../icontypes';
 
 export default class IconPickerFAIcon extends View {
 	/**
-	 * Creates a new IconPickerFAIcon.
+	 * Constructs a new IconPickerFAIcon.
 	 * 
-	 * @param {Locale} locale
+	 * @param locale
 	 *   The locale.
-	 * @param {FontAwesomeVersion} faVersion
+	 * @param faVersion
 	 *   The version of Font Awesome being used.
-	 * @param {string} iconName
+	 * @param iconName
 	 *   The name of the icon this button is for.
-	 * @param {IconDefinition} iconDefinition
+	 * @param iconDefinition
 	 *   The defintion of the icon this button is for.
-	 * @param {string?} iconStyle
+	 * @param iconStyle
 	 *   The preferred style to display the icon in (optional).
 	 */
-	constructor(locale, faVersion, iconName, iconDefinition, iconStyle) {
+	public constructor(locale: Locale, faVersion: FontAwesomeVersion, iconName: IconName, iconDefinition: IconDefinition, iconStyle?: FontAwesomeStyle) {
 		super(locale);
 
 		this.setTemplate({

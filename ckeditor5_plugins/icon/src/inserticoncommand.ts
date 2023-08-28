@@ -1,18 +1,17 @@
 /**
  * @file defines InsertIconCommand, which is executed when the icon toolbar button is pressed.
- * 
- * @typedef { import('@ckeditor/ckeditor5-engine').Element } Element
- * @typedef { import('@ckeditor/ckeditor5-engine/src/model/writer').default } Writer
  */
 
-import { sizeDefault } from './iconconfig';
 import { Command } from 'ckeditor5/src/core';
 
+/**
+ * Represents a command which is executed when the icon toolbar button is pressed.
+ */
 export default class InsertIconCommand extends Command {
 	/**
 	 * @inheritdoc
 	 */
-	execute({ iconClass = 'fa-solid fa-chess-rook' }) {
+	public override execute({ iconClass = 'fa-solid fa-chess-rook' }) {
 		const { editing, model } = this.editor;
 
 		model.change((writer) => {
@@ -28,7 +27,7 @@ export default class InsertIconCommand extends Command {
 	/**
 	 * @inheritdoc
 	 */
-	refresh() {
+	public override refresh() {
 		const { model } = this.editor;
 		const { selection } = model.document;
 
@@ -36,7 +35,7 @@ export default class InsertIconCommand extends Command {
 		// icon is permitted. This is based on the schema of the model(s)
 		// currently containing the cursor.
 		const allowedIn = model.schema.findAllowedParent(
-			selection.getFirstPosition(),
+			selection.getFirstPosition()!,
 			'icon'
 		);
 

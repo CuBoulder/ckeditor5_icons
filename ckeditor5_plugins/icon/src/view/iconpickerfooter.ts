@@ -1,25 +1,70 @@
 /**
  * @file contains the icon picker icon for FontAwesome icons.
- * 
- * @typedef { import('../iconconfig').FontAwesomeVersion } FontAwesomeVersion
- * @typedef { import('@types/ckeditor__ckeditor5-utils').Locale } Locale
  */
 
+import type { Locale } from 'ckeditor5/src/utils';
 import { View } from 'ckeditor5/src/ui';
 import IconPickerFAIcon from './iconpickerfaicon';
 import IconPickerForm from './iconpickerform';
 import IconPickerSearch from './iconpickersearch';
+import type { FontAwesomeStyle, FontAwesomeVersion, IconDefinition, IconName } from '../icontypes';
 
 export default class IconPickerFooter extends View {
 	/**
-	 * Creates a new IconPickerFooter.
+	 * The Font Awesome version.
+	 */
+	private readonly faVersion: FontAwesomeVersion;
+
+	/**
+	 * The name of the currently selected icon.
 	 * 
-	 * @param {Locale} locale
+	 * @observable
+	 */
+	public iconName?: IconName | null;
+
+	/**
+	 * The selected style of the currently selected icon.
+	 * 
+	 * @observable
+	 */
+	public iconStyle?: FontAwesomeStyle;
+
+	/**
+	 * The definition of the currently selected icon.
+	 * 
+	 * @observable
+	 */
+	public iconDefinition?: IconDefinition | null;
+
+	/**
+	 * The search form view.
+	 */
+	public readonly searchView: IconPickerSearch;
+
+	/**
+	 * The selected icon preview view.
+	 */
+	public readonly iconPreviewView: View;
+
+	/**
+	 * The selected icon insert form view.
+	 */
+	public readonly formView: IconPickerForm;
+
+	/**
+	 * The FontAwesome icon view (if an icon is selected).
+	 */
+	private faIcon: IconPickerFAIcon | null;
+
+	/**
+	 * Constructs a new IconPickerFooter.
+	 * 
+	 * @param locale
 	 *   The locale.
-	 * @param {FontAwesomeVersion} faVersion
+	 * @param faVersion
 	 *   The version of Font Awesome being used.
 	 */
-	constructor(locale, faVersion) {
+	public constructor(locale: Locale, faVersion: FontAwesomeVersion) {
 		super(locale);
 		this.faVersion = faVersion;
 
@@ -28,7 +73,6 @@ export default class IconPickerFooter extends View {
 		this.searchView = new IconPickerSearch(locale);
 		this.searchView.delegate('search').to(this);
 
-		this._faIcon = null;
 		this.iconPreviewView = new View();
 		this.iconPreviewView.setTemplate({
 			tag: 'div',
@@ -36,11 +80,12 @@ export default class IconPickerFooter extends View {
 				class: ['ck', 'ckeditor5-icons__icon-preview']
 			}
 		});
+		this.faIcon = null;
 
 		this.formView = new IconPickerForm(locale);
 		this.formView.delegate('changeStyle', 'cancel').to(this);
 		this.formView.delegate('submit').to(this, 'execute');
-		this.formView.bind('iconName', 'iconStyle', 'iconDefinition').to(this);
+		this.formView.bind('iconStyle').to(this);
 
 		this.setTemplate({
 			tag: 'div',
@@ -110,36 +155,25 @@ export default class IconPickerFooter extends View {
 
 	/**
 	 * Refreshes the icon picker footer when an icon in the grid is selected.
-	 * 
-	 * @param {string[]} faStyles
-	 *   The enabled Font Awesome icon styles.
 	 */
-	refresh(faStyles) {
+	public refresh() {
 		if (this.iconDefinition)
-			this.formView.refresh(faStyles);
+			this.formView.refresh(this.iconName, this.iconDefinition);
 
 		const iconPreviewView = this.iconPreviewView;
-		let faIcon = null;
+		let faIcon: IconPickerFAIcon | null = null;
 
-		if (this._faIcon) {
-			iconPreviewView.deregisterChild(this._faIcon);
-			iconPreviewView.element.innerText = '';
+		if (this.faIcon) {
+			iconPreviewView.deregisterChild(this.faIcon);
+			iconPreviewView.element!.innerText = '';
 		}
 
 		if (this.iconName && this.iconDefinition) {
-			faIcon = new IconPickerFAIcon(this.locale, this.faVersion, this.iconName, this.iconDefinition, this.iconStyle);
+			faIcon = new IconPickerFAIcon(this.locale!, this.faVersion, this.iconName, this.iconDefinition, this.iconStyle);
 			iconPreviewView.registerChild(faIcon);
-			iconPreviewView.element.appendChild(faIcon.element);
+			iconPreviewView.element!.appendChild(faIcon.element!);
 		}
 
-		this._faIcon = faIcon;
-	}
-
-	/**
-	 * Focuses the form view.
-	 */
-	focus() {
-		if (this.iconName)
-			this.formView.focus();
+		this.faIcon = faIcon;
 	}
 }

@@ -10,16 +10,18 @@
 
 // The contents of IconUI and Icon editing could be included in this
 // file, but it is recommended to separate these concerns in different files.
+import type { PluginDependencies } from 'ckeditor5/src/core';
+import type { PluginInterface } from '@ckeditor/ckeditor5-core/src/plugin';
+import { Plugin } from 'ckeditor5/src/core';
 import IconEditing from './iconediting';
 import IconPicker from './iconpicker';
 import IconToolbar from './icontoolbar';
-import { Plugin } from 'ckeditor5/src/core';
 
-export default class Icon extends Plugin {
+export default class Icon extends Plugin implements PluginInterface  {
 	// Note that IconEditing and IconUI also extend `Plugin`, but these
 	// are not seen as individual plugins by CKEditor 5. CKEditor 5 will only
 	// discover the plugins explicitly exported in index.js.
-	static get requires() {
-		return [IconEditing, IconPicker, IconToolbar];
+	public static get requires(): PluginDependencies {
+		return [IconEditing, IconPicker, IconToolbar] as const;
 	}
 }

@@ -1,18 +1,19 @@
 /**
  * @file defines schemas, converters, and commands for the icon plugin.
- * 
- * @typedef { import('./iconconfig').SelectableOption } SelectableOption
- * @typedef { import('@ckeditor/ckeditor5-engine').DowncastWriter } DowncastWriter
- * @typedef { import('@ckeditor/ckeditor5-engine/src/model/element').default } ModelElement
- * @typedef { import('@ckeditor/ckeditor5-engine/src/view/containerelement').default } ContainerElement
  */
 
+import type { PluginInterface } from '@ckeditor/ckeditor5-core/src/plugin';
+import type { PluginDependencies } from 'ckeditor5/src/core';
 import { Plugin } from 'ckeditor5/src/core';
-import { toWidget } from 'ckeditor5/src/widget';
-import { Widget } from 'ckeditor5/src/widget';
+import { Widget, toWidget } from 'ckeditor5/src/widget';
+import type { DowncastWriter } from 'ckeditor5/src/engine';
+import type ModelElement from '@ckeditor/ckeditor5-engine/src/model/element';
+import type ContainerElement from '@ckeditor/ckeditor5-engine/src/view/containerelement';
 import InsertIconCommand from './inserticoncommand';
 import ModifyIconCommand from './modifyiconcommand';
+import type { Size, Alignment } from './iconconfig';
 import { sizeOptions, sizeDefault, alignmentOptions, alignmentDefault } from './iconconfig';
+import type { SelectableOption } from './icontypes';
 
 // cSpell:ignore icon inserticoncommand
 
@@ -30,31 +31,31 @@ import { sizeOptions, sizeDefault, alignmentOptions, alignmentDefault } from './
  * This file has the logic for defining the icon model, and for how it is
  * converted to standard DOM markup.
  */
-export default class IconEditing extends Plugin {
+export default class IconEditing extends Plugin implements PluginInterface {
 	/**
 	 * @inheritdoc
 	 */
-	static get requires() {
-		return [Widget];
+	public static get requires(): PluginDependencies {
+		return [Widget] as const;
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	init() {
+	public init() {
 		this._defineSchema();
 		this._defineConverters();
 		this._defineCommands();
 	}
 
-	/*
+	/**
 	 * This registers the structure that will be seen by CKEditor 5 as
-	 * <icon></icon>
+	 * &lt;icon&gt;&lt;/icon&gt;
 	 *
 	 * The logic in _defineConverters() will determine how this is converted to
 	 * markup.
 	 */
-	_defineSchema() {
+	private _defineSchema() {
 		// Schemas are registered via the central `editor` object.
 		const schema = this.editor.model.schema;
 
@@ -74,7 +75,7 @@ export default class IconEditing extends Plugin {
 	 * Converters determine how CKEditor 5 models are converted into markup and
 	 * vice-versa.
 	 */
-	_defineConverters() {
+	private _defineConverters() {
 		// Defines the regex for detecting an icon's style.
 		const styleRegex = /(fa-(solid|regular|light|thin|duotone|brands))|fas|far|fal|fad|fab/;
 
@@ -85,14 +86,16 @@ export default class IconEditing extends Plugin {
 		conversion.for('upcast').attributeToAttribute({
 			model: {
 				key: 'iconClass',
-				value: viewElement => {
+				value: (viewElement: Element) => {
 					if (!viewElement.hasAttribute('class'))
-						return;
-					const classNames = viewElement.getAttribute('class').match(/(fa-([a-z0-9\-]+)|fas|far|fal|fad|fab)/g);
+						return '';
+					const classNames = viewElement.getAttribute('class')!.match(/(fa-([a-z0-9\-]+)|fas|far|fal|fad|fab)/g);
 					let iconClass = '';
-					for (let className of classNames) {
-						if (!className.match(/fa-(2xs|xs|sm|lg|xl|2xl|([0-9]|10)x)/) && !className.match(/fa-(pull-left|pull-right)/)) // Filters out the dedicated attributes.
-							iconClass = iconClass ? iconClass + ' ' + className : className;
+					if (classNames) {
+						for (const className of classNames) {
+							if (!className.match(/fa-(2xs|xs|sm|lg|xl|2xl|([0-9]|10)x)/) && !className.match(/fa-(pull-left|pull-right)/)) // Filters out the dedicated attributes.
+								iconClass = iconClass ? iconClass + ' ' + className : className;
+						}
 					}
 					return iconClass;
 				}
@@ -101,8 +104,8 @@ export default class IconEditing extends Plugin {
 		});
 
 		// The size and alignment attributes converts to element class names.
-		conversion.attributeToAttribute(buildAttributeToAttributeDefinition('iconSize', sizeOptions));
-		conversion.attributeToAttribute(buildAttributeToAttributeDefinition('iconAlignment', alignmentOptions));
+		conversion.attributeToAttribute(buildAttributeToAttributeClassNameDefinition<Size>('iconSize', sizeOptions));
+		conversion.attributeToAttribute(buildAttributeToAttributeClassNameDefinition<Alignment>('iconAlignment', alignmentOptions));
 
 		// Upcast Converters: determine how existing HTML is interpreted by the
 		// editor. These trigger when an editor instance loads.
@@ -143,25 +146,26 @@ export default class IconEditing extends Plugin {
 	/**
 	 * Defines the commands for inserting or modifying the icon.
 	 */
-	_defineCommands() {
+	private _defineCommands() {
 		const editor = this.editor, commands = editor.commands;
 		commands.add('insertIcon', new InsertIconCommand(editor));
-		commands.add('sizeIcon', new ModifyIconCommand(editor, 'iconSize', sizeDefault));
-		commands.add('alignIcon', new ModifyIconCommand(editor, 'iconAlignment', sizeDefault));
+		commands.add('sizeIcon', new ModifyIconCommand<Size>(editor, 'iconSize', sizeDefault));
+		commands.add('alignIcon', new ModifyIconCommand<Alignment>(editor, 'iconAlignment', alignmentDefault));
 	}
 }
 
 /**
- * @param {string} attributeName 
+ * @param attributeName 
  *   The attribute name.
- * @param {Object<string, SelectableOption>} attributeOptions
+ * @param attributeOptions
  *   The options avaliable for the attribute.
  * @returns 
  *   The attribute to attribute definition of the specified attribute.
  */
-function buildAttributeToAttributeDefinition(attributeName, attributeOptions) {
-	const view = {}, values = [];
-	for (const [value, option] of Object.entries(attributeOptions)) {
+function buildAttributeToAttributeClassNameDefinition<T extends string>(attributeName: string, attributeOptions: Record<T, SelectableOption>) {
+	const view: { [key: string]: { key: 'class', value: string } } = {};
+	const values: string[] = [];
+	for (const [value, option] of Object.entries<SelectableOption>(attributeOptions)) {
 		if (!option.className) continue;
 		values.push(value);
 		view[value] = { key: 'class', value: option.className };
@@ -171,32 +175,32 @@ function buildAttributeToAttributeDefinition(attributeName, attributeOptions) {
 			key: attributeName,
 			values: values
 		},
-		view
+		view: view
 	};
 }
 
 /**
- * @param {ModelElement} modelElement
+ * @param modelElement
  *   The model element.
- * @param {DowncastWriter} viewWriter
+ * @param viewWriter
  *   The downcast writer.
- * @returns {ContainerElement}
+ * @returns
  *   The icon container element or widget.
  */
-function createIconView(modelElement, viewWriter) {
+function createIconView(modelElement: ModelElement, viewWriter: DowncastWriter): ContainerElement {
 	const iconClass = modelElement.getAttribute('iconClass');
 	return viewWriter.createContainerElement('i', { class: iconClass });
 }
 
 /**
-* @param {ModelElement} modelElement
+* @param modelElement
  *   The model element.
- * @param {DowncastWriter} viewWriter
+ * @param viewWriter
  *   The downcast writer.
- * @returns {ContainerElement}
+ * @returns
  *   The icon container element or widget.
  */
-function createIconWidgetView(modelElement, viewWriter) {
+function createIconWidgetView(modelElement: ModelElement, viewWriter: DowncastWriter): ContainerElement {
 	const iconClass = modelElement.getAttribute('iconClass');
 	return toWidget(
 		viewWriter.createContainerElement('span', { class: 'ckeditor5-icons__widget' }, [viewWriter.createRawElement('span', {}, element => element.innerHTML = '<i class="' + iconClass + '"></i>')]), viewWriter, { label: 'icon widget' }

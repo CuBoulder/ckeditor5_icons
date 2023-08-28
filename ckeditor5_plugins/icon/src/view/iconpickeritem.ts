@@ -1,41 +1,44 @@
 /**
  * @file contains the icon picker grid button for FontAwesome icons.
- * 
- * @typedef { import('../iconconfig').FontAwesomeVersion } FontAwesomeVersion
- * @typedef { import('../iconconfig').IconDefinition } IconDefinition
- * @typedef { import('@ckeditor/ckeditor5-utils').Locale } Locale
  */
 
+import type { Locale } from 'ckeditor5/src/utils';
 import { ButtonView } from 'ckeditor5/src/ui';
 import IconPickerFAIcon from './iconpickerfaicon';
+import type { FontAwesomeVersion, IconDefinition, IconName } from '../icontypes';
 
 export default class IconPickerItem extends ButtonView {
 	/**
-	 * Creates a new IconPickerItem.
+	 * The FontAwesome icon view.
+	 */
+	private readonly faIcon: IconPickerFAIcon;
+
+	/**
+	 * Constructs a new IconPickerItem.
 	 * 
-	 * @param {Locale} locale
+	 * @param locale
 	 *   The locale.
-	 * @param {FontAwesomeVersion} faVersion
+	 * @param faVersion
 	 *   The version of Font Awesome being used.
-	 * @param {string} iconName
+	 * @param iconName
 	 *   The name of the icon this button is for.
-	 * @param {IconDefinition} iconDefinition
+	 * @param iconDefinition
 	 *   The defintion of the icon this button is for.
 	 */
-	constructor(locale, faVersion, iconName, iconDefinition) {
+	public constructor(locale: Locale, faVersion: FontAwesomeVersion, iconName: IconName, iconDefinition: IconDefinition) {
 		super(locale);
-		
+
 		const bind = this.bindTemplate;
-	
+
 		this.set({
-			label:locale.t(iconDefinition.label),
+			label: locale.t(iconDefinition.label),
 			class: 'ckeditor5-icons__grid-item',
 			isOn: false,
 			withText: true
 		});
 
-		this._faIcon = new IconPickerFAIcon(locale, faVersion, iconName, iconDefinition);
-		this._faIcon.extendTemplate({
+		this.faIcon = new IconPickerFAIcon(locale, faVersion, iconName, iconDefinition);
+		this.faIcon.extendTemplate({
 			attributes: {
 				class: [
 					'ck-icon',
@@ -55,14 +58,14 @@ export default class IconPickerItem extends ButtonView {
 			}
 		});
 
-		this.registerChild([this._faIcon]);
+		this.registerChild([this.faIcon]);
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	render() {
+	public override render() {
 		super.render();
-		this.element.appendChild(this._faIcon.element);
+		this.element!.appendChild(this.faIcon.element!);
 	}
 }
