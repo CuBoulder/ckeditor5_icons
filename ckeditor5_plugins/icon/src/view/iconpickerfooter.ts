@@ -136,17 +136,10 @@ export default class IconPickerFooter extends View {
 				{
 					tag: 'div',
 					attributes: {
-						class: ['ck', 'ckeditor5-icons__footer-flex', bind.to('iconName', value => value ? 'ck-hidden' : '')]
+						class: ['ck', bind.to('iconName', value => value ? 'ck-hidden' : '')]
 					},
 					children: [
-						this.searchView,
-						{
-							tag: 'div',
-							attributes: {
-								class: ['ck', 'ckeditor5-icons__library-attr']
-							},
-							children: [{ text: faVersion === '5' ? 'Font Awesome 5' : 'Font Awesome 6' }]
-						}
+						this.searchView
 					]
 				}
 			]

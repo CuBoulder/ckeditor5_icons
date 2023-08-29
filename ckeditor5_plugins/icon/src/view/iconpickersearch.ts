@@ -6,7 +6,7 @@ import type { Locale } from 'ckeditor5/src/utils';
 import type { ButtonView, InputTextView, ButtonExecuteEvent } from 'ckeditor5/src/ui';
 import { createLabeledInputText, LabeledFieldView, View } from 'ckeditor5/src/ui';
 import type { InputViewInputEvent } from '@ckeditor/ckeditor5-ui/src/input/inputview';
-import { createButton } from './iconviewutils';
+import { createButton } from './viewutils';
 import { icons } from 'ckeditor5/src/core';
 
 export default class IconPickerSearch extends View {
@@ -41,7 +41,7 @@ export default class IconPickerSearch extends View {
 			delayTimer = setTimeout(() => this.fire<SearchEvent>('search', value), delayms);
 			this.searchFieldView.fieldView.set('value', value);
 		});
-		this.clearButtonView = createButton(t('Clear search'), icons.cancel, 'ck-button-cancel');
+		this.clearButtonView = createButton(locale, t('Clear search'), icons.cancel, 'ck-button-cancel');
 		this.clearButtonView.isVisible = false;
 		this.clearButtonView.on<ButtonExecuteEvent>('execute', () => {
 			if (delayTimer)

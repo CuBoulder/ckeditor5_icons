@@ -5,10 +5,11 @@
 import type { Locale } from 'ckeditor5/src/utils';
 import { Collection } from 'ckeditor5/src/utils';
 import type { ListDropdownItemDefinition, DropdownView, FocusableView } from 'ckeditor5/src/ui';
-import { addListToDropdown, createDropdown, FormHeaderView, Model } from 'ckeditor5/src/ui';
-import type { CategoryDefinition, CategoryDefinitions, CategoryName, FontAwesomeStyle, IconName } from '../icontypes';
+import { addListToDropdown, createDropdown, Model, View } from 'ckeditor5/src/ui';
+import type { CategoryDefinition, CategoryDefinitions, CategoryName, FontAwesomeStyle, FontAwesomeVersion, IconName } from '../icontypes';
+import fontAwesomeIcon from 'fontawesome6/svgs/solid/font-awesome.svg';
 
-export default class IconPickerHeader extends FormHeaderView implements FocusableView {
+export default class IconPickerHeader extends View implements FocusableView {
 	/**
 	 * The name of the currently selected category.
 	 * 
@@ -17,11 +18,28 @@ export default class IconPickerHeader extends FormHeaderView implements Focusabl
 	public declare categoryName: CategoryName | null;
 
 	/**
+	 * The attribution name of the currently selected category.
+	 * 
+	 * @observable
+	 */
+	public declare categoryAttributionName: CategoryName | null | '_search';
+
+	/**
 	 * The definiton of the currently selected category.
 	 * 
 	 * @observable
 	 */
 	public declare categoryDefinition: CategoryDefinition | null;
+
+	/**
+	 * The Font Awesome icon view.
+	 */
+	private readonly attributionIconView: View;
+
+	/**
+	 * The Font Awesome library attribution view.
+	 */
+	public readonly attributionView: View;
 
 	/**
 	 * The category dropdown view.
@@ -33,6 +51,8 @@ export default class IconPickerHeader extends FormHeaderView implements Focusabl
 	 * 
 	 * @param locale
 	 *   The locale.
+	 * @param faVersion
+	 *   The version of Font Awesome being used.
 	 * @param faCategories
 	 *   The Font Awesome category definitions.
 	 * @param faStyles
@@ -40,21 +60,69 @@ export default class IconPickerHeader extends FormHeaderView implements Focusabl
 	 * @param recommendedIcons
 	 *   The icons to display in the recommended category.
 	 */
-	public constructor(locale: Locale, faCategories: CategoryDefinitions, faStyles: FontAwesomeStyle[], recommendedIcons: IconName[] | null | undefined) {
+	public constructor(locale: Locale, faVersion: FontAwesomeVersion, faCategories: CategoryDefinitions, faStyles: FontAwesomeStyle[], recommendedIcons: IconName[] | null | undefined) {
 		super(locale);
+
+		const bind = this.bindTemplate, t = locale.t;
 
 		this.categoryDropdownView = this._createCategoryDropdown(locale, faCategories, faStyles, recommendedIcons);
 		this.categoryDropdownView.panelPosition = locale.uiLanguageDirection === 'rtl' ? 'se' : 'sw';
 
-		this.label = locale.t('Icons');
-		this.class = 'ckeditor5-icons__picker-header';
+		this.attributionIconView = new View(locale);
+		this.attributionIconView.setTemplate({ tag: 'span', attributes: { class: ['ck', bind.to('categoryAttributionName', (value => value === '_recommended' ? 'ck-hidden' : ''))] } });
+		this.attributionView = new View(locale);
+		this.attributionView.setTemplate({
+			tag: 'div',
+			attributes: {
+				class: ['ck', 'ckeditor5-icons__library-attr']
+			},
+			children: [
+				this.attributionIconView,
+				{
+					'tag': 'span',
+					children: [
+						{ text: bind.to('categoryAttributionName', (value => value === '_recommended' ? t('Recommended') : (faVersion === '5' ? 'Font Awesome 5' : 'Font Awesome 6') + (value ? ': ' + t(value === '_search' ? 'Search' : value === '_all' || value === '_brands' ? faCategories[value]!.label : 'Categories') : ''))) }
+					]
+				}
+			]
+		});
 
-		this.children.add(this.categoryDropdownView);
+		this.setTemplate({
+			tag: 'div',
+			attributes: {
+				class: ['ck', 'ck-form__header', 'ckeditor5-icons__picker-header']
+			},
+			children: [
+				{
+					tag: 'div',
+					children: [
+						{
+							tag: 'h2',
+							attributes: {
+								class: ['ck', 'ck-form__header__label']
+							},
+							children: [{ text: t('Icons') }]
+						},
+						this.attributionView
+					]
+				},
+				this.categoryDropdownView
+			]
+		})
 
 		this.on<CategorySelectionEvent>('execute', (_eventInfo, categoryName, categoryDefinition) => {
 			this.set('categoryName', categoryName);
+			this.set('categoryAttributionName', categoryName);
 			this.set('categoryDefinition', categoryDefinition);
 		});
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public override render() {
+		super.render();
+		this.attributionIconView.element!.innerHTML = fontAwesomeIcon;
 	}
 
 	/**
@@ -86,6 +154,7 @@ export default class IconPickerHeader extends FormHeaderView implements Focusabl
 			class: 'ck-dropdown__button_label-width_auto'
 		});
 		dropdownView.buttonView.bind('label').to(this, 'categoryDefinition', value => t(value ? value.label : defaultLabel));
+		dropdownView.panelView.extendTemplate({ attributes: { tabindex: '-1' } }); // Prevents grabbing the scrollbar from closing the panel.
 		dropdownView.on('execute', eventInfo => {
 			const categoryName = (eventInfo.source as Model)['name'] as string;
 			this.fire<CategorySelectionEvent>('execute', categoryName, faCategories[categoryName]!);
@@ -101,29 +170,30 @@ export default class IconPickerHeader extends FormHeaderView implements Focusabl
 	 *   The category dropdown view items collection.
 	 */
 	private _createCategoryDropdownItems(locale: Locale, faCategories: CategoryDefinitions, faStyles: FontAwesomeStyle[], recommendedIcons: IconName[] | null | undefined): Collection<ListDropdownItemDefinition> {
+		const items = new Collection<ListDropdownItemDefinition>();
+
 		const pinnedCategoryNames: CategoryName[] = [];
 		const pinnedCategoryDefinitons: CategoryDefinitions = {
 			all: { icons: [], label: 'All' },
 			brands: { icons: [], label: 'Brands' }
 		};
 
-		if (recommendedIcons) {
-			pinnedCategoryNames.push('recommended');
-			pinnedCategoryDefinitons['recommended'] = { icons: recommendedIcons, label: 'Recommended' };
+		if (recommendedIcons) { // Adds the "Recommended" category if it is defined.
+			const recommendedCategoryDefiniton = faCategories['_recommended'] = { icons: recommendedIcons, label: 'Recommended' };
+			this._addCategoryDropdownItem(locale, items, '_recommended', recommendedCategoryDefiniton);
+			items.add({ type: 'separator' });
 		}
+
 		pinnedCategoryNames.push('all');
 		if (faStyles.includes('brands')) // Adds the "Brands" category if the brands style is accessible.
 			pinnedCategoryNames.push('brands');
-
-		const items = new Collection<ListDropdownItemDefinition>();
 
 		const categoryEntries = Object.entries<CategoryDefinition>(faCategories);
 
 		for (const categoryName of pinnedCategoryNames) {
 			const categoryDefinition = pinnedCategoryDefinitons[categoryName]!, categoryNameEscaped = '_' + categoryName;
 			this._addCategoryDropdownItem(locale, items, categoryNameEscaped, categoryDefinition);
-			if (!faCategories[categoryNameEscaped])
-				faCategories[categoryNameEscaped] = categoryDefinition;
+			faCategories[categoryNameEscaped] = categoryDefinition;
 		}
 		items.add({ type: 'separator' });
 		for (const [categoryName, categoryDefinition] of categoryEntries) {

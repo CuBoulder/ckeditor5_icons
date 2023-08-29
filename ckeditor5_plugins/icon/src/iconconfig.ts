@@ -15,8 +15,13 @@ export interface IconConfig {
 	recommendedIcons?: IconName[] | null;
 };
 
+export type ModelAttribute = 'iconClass' | 'iconSize' | 'iconAlignment';
+
+export type ModelAttributeDefiniton<T extends string = string, A extends ModelAttribute = ModelAttribute> = [T, A];
+
 // === Sizes ===
 export type Size = 'extraSmall' | 'small' | 'regular' | 'large' | 'extraLarge' | '2x' | '3x' | '4x' | '5x' | '6x' | '7x' | '8x' | '9x' | '10x';
+export type SizeAttributeDefinition = ModelAttributeDefiniton<Size, 'iconSize'>;
 export const sizeOptions: { [key in Size]: SelectableOption; } = {
 	extraSmall: {
 		label: 'Extra Small',
@@ -81,8 +86,10 @@ export const sizeOptions: { [key in Size]: SelectableOption; } = {
 };
 export const sizeDefault: Size = 'regular';
 
+
 // === Alignments ===
 export type Alignment = 'none' | 'left' | 'right';
+export type AlignmentAttributeDefinition = ModelAttributeDefiniton<Alignment, 'iconAlignment'>;
 export const alignmentOptions: { [key in Alignment]: SelectableOption; } = {
 	none: {
 		label: 'With text',

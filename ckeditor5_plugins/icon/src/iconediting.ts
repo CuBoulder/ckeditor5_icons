@@ -11,7 +11,7 @@ import type ModelElement from '@ckeditor/ckeditor5-engine/src/model/element';
 import type ContainerElement from '@ckeditor/ckeditor5-engine/src/view/containerelement';
 import InsertIconCommand from './inserticoncommand';
 import ModifyIconCommand from './modifyiconcommand';
-import type { Size, Alignment } from './iconconfig';
+import type { Size, Alignment, SizeAttributeDefinition, AlignmentAttributeDefinition, ModelAttribute, ModelAttributeDefiniton } from './iconconfig';
 import { sizeOptions, sizeDefault, alignmentOptions, alignmentDefault } from './iconconfig';
 import type { SelectableOption } from './icontypes';
 
@@ -59,6 +59,8 @@ export default class IconEditing extends Plugin implements PluginInterface {
 		// Schemas are registered via the central `editor` object.
 		const schema = this.editor.model.schema;
 
+		const allowAttributes: ModelAttribute[] = ['iconClass', 'iconSize', 'iconAlignment'];
+
 		schema.register('icon', {
 			// Behaves like a self-contained object (e.g. an image).
 			isObject: true,
@@ -67,7 +69,7 @@ export default class IconEditing extends Plugin implements PluginInterface {
 			// Allows an icon to be inserted wherever text is allowed (including another container such as a button).
 			allowWhere: '$text',
 			// Allow the attributes which control the icon's class, size, and alignment.
-			allowAttributes: ['iconClass', 'iconSize', 'iconAlignment']
+			allowAttributes
 		});
 	}
 
@@ -104,8 +106,8 @@ export default class IconEditing extends Plugin implements PluginInterface {
 		});
 
 		// The size and alignment attributes converts to element class names.
-		conversion.attributeToAttribute(buildAttributeToAttributeClassNameDefinition<Size>('iconSize', sizeOptions));
-		conversion.attributeToAttribute(buildAttributeToAttributeClassNameDefinition<Alignment>('iconAlignment', alignmentOptions));
+		conversion.attributeToAttribute(buildAttributeToAttributeClassNameDefinition<Size, SizeAttributeDefinition>('iconSize', sizeOptions));
+		conversion.attributeToAttribute(buildAttributeToAttributeClassNameDefinition<Alignment, AlignmentAttributeDefinition>('iconAlignment', alignmentOptions));
 
 		// Upcast Converters: determine how existing HTML is interpreted by the
 		// editor. These trigger when an editor instance loads.
@@ -149,8 +151,8 @@ export default class IconEditing extends Plugin implements PluginInterface {
 	private _defineCommands() {
 		const editor = this.editor, commands = editor.commands;
 		commands.add('insertIcon', new InsertIconCommand(editor));
-		commands.add('sizeIcon', new ModifyIconCommand<Size>(editor, 'iconSize', sizeDefault));
-		commands.add('alignIcon', new ModifyIconCommand<Alignment>(editor, 'iconAlignment', alignmentDefault));
+		commands.add('sizeIcon', new ModifyIconCommand<Size, SizeAttributeDefinition>(editor, 'iconSize', sizeDefault));
+		commands.add('alignIcon', new ModifyIconCommand<Alignment, AlignmentAttributeDefinition>(editor, 'iconAlignment', alignmentDefault));
 	}
 }
 
@@ -162,7 +164,7 @@ export default class IconEditing extends Plugin implements PluginInterface {
  * @returns 
  *   The attribute to attribute definition of the specified attribute.
  */
-function buildAttributeToAttributeClassNameDefinition<T extends string>(attributeName: string, attributeOptions: Record<T, SelectableOption>) {
+function buildAttributeToAttributeClassNameDefinition<T extends string, D extends ModelAttributeDefiniton<T>>(attributeName: D[1], attributeOptions: Record<T, SelectableOption>) {
 	const view: { [key: string]: { key: 'class', value: string } } = {};
 	const values: string[] = [];
 	for (const [value, option] of Object.entries<SelectableOption>(attributeOptions)) {

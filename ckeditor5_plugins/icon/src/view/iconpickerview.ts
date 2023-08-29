@@ -96,7 +96,7 @@ export default class IconPickerView extends View implements FocusableView {
 		this.set('iconStyle', null);
 		this.set('iconDefinition', null);
 
-		this.headerView = new IconPickerHeader(locale, faCategories, faStyles, recommendedIcons);
+		this.headerView = new IconPickerHeader(locale, faVersion, faCategories, faStyles, recommendedIcons);
 		this.gridView = new IconPickerGrid(locale, faVersion);
 		this.footerView = new IconPickerFooter(locale, faVersion);
 		this.searchFieldView = this.footerView.searchView.searchFieldView.fieldView;
@@ -118,12 +118,13 @@ export default class IconPickerView extends View implements FocusableView {
 
 		this.setTemplate({
 			tag: 'div',
-			children: [this.headerView, this.gridView, this.footerView],
 			attributes: {
+				class: ['ck', 'ckeditor5-icons__picker'],
 				// Avoid focus loss when the user clicks the area of the grid that is not a button.
 				// https://github.com/ckeditor/ckeditor5/pull/12319#issuecomment-1231779819
 				tabindex: '-1'
-			}
+			},
+			children: [this.headerView, this.gridView, this.footerView]
 		});
 
 		this.items.add(this.headerView);
@@ -166,12 +167,14 @@ export default class IconPickerView extends View implements FocusableView {
 			}
 			if (searchQuery) {
 				this.gridView.refresh('_all', faCategories['_all']!, faIcons, searchQuery);
+				this.headerView.set('categoryAttributionName', '_search');
 				this.headerView.categoryDropdownView.buttonView.set('isVisible', false);
 				this._stopTracking(this.headerView);
 				searchClearButtonView.isVisible = true;
 				this._startTracking(searchClearButtonView);
 			} else {
 				this.gridView.refresh(this.headerView.categoryName || '_all', this.headerView.categoryDefinition || faCategories['_all']!, faIcons);
+				this.headerView.set('categoryAttributionName', this.headerView.categoryName);
 				this.headerView.categoryDropdownView.buttonView.set('isVisible', true);
 				this._startTracking(this.headerView, 0);
 				searchClearButtonView.isVisible = false;

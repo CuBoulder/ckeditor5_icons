@@ -5,25 +5,26 @@
 import { Command } from 'ckeditor5/src/core';
 import { getSelectedIconWidget } from './iconutils';
 import type { Editor } from 'ckeditor5/src/core';
+import type { ModelAttributeDefiniton } from './iconconfig';
 
 /**
  * Represents a command which is executed to modify attributes of the icon from the widget toolbar.
  */
-export default class ModifyIconCommand<T extends string> extends Command {
+export default class ModifyIconCommand<T extends string, D extends ModelAttributeDefiniton<T> = ModelAttributeDefiniton<T>> extends Command {
 	/** 
 	 * The name of the attribute this command modifies.
 	 */
-	private readonly attributeName: string
+	private readonly attributeName: D[1];
 
 	/**
 	 * The default value to set if there isn't one specified.
 	 */
-	private readonly defaultValue: T
+	private readonly defaultValue: T;
 
 	/**
 	 * The value of this command.
 	 */
-	public override value: T
+	public override value: T;
 
 	/**
 	 * Constructs a new ModifyIconCommand.
@@ -35,7 +36,7 @@ export default class ModifyIconCommand<T extends string> extends Command {
 	 * @param defaultValue 
 	 *   The default value to set if there isn't one specified.
 	 */
-	public constructor(editor: Editor, attributeName: string, defaultValue: T) {
+	public constructor(editor: Editor, attributeName: D[1], defaultValue: T) {
 		super(editor);
 		this.attributeName = attributeName;
 		this.defaultValue = defaultValue;

@@ -2,6 +2,7 @@
  * @file defines utility functions for views.
  */
 
+import type { Locale } from 'ckeditor5/src/utils';
 import { ButtonView } from 'ckeditor5/src/ui';
 
 /**
@@ -18,8 +19,8 @@ import { ButtonView } from 'ckeditor5/src/ui';
  * @returns
  *   A button with the specified parameters.
  */
-export function createButton(label: string, icon?: string | null, className?: string | null, withText?: boolean | string | null): ButtonView {
-	const button = new ButtonView();
+export function createButton(locale: Locale, label: string, icon?: string | null, className?: string | null, withText?: boolean | string | null): ButtonView {
+	const button = new ButtonView(locale);
 
 	button.set({
 		label: typeof withText === 'string' ? withText : label,

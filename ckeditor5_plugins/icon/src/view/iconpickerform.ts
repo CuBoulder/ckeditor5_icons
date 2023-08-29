@@ -9,7 +9,7 @@ import { icons } from 'ckeditor5/src/core';
 import { Collection } from 'ckeditor5/src/utils';
 import { faStyleLabels } from '../iconconfig';
 import type { FontAwesomeStyle, IconDefinition, IconName } from '../icontypes';
-import { createButton } from './iconviewutils';
+import { createButton } from './viewutils';
 
 export default class IconPickerForm extends View {
 	/**
@@ -59,12 +59,12 @@ export default class IconPickerForm extends View {
 		this.styleDropdownItems = new Collection<ListDropdownItemDefinition>();
 		addListToDropdown(this.styleDropdownView, this.styleDropdownItems);
 
-		this.submitButtonView = createButton(t('Insert'), icons.check, 'ck-button-save');
+		this.submitButtonView = createButton(locale, t('Insert'), icons.check, 'ck-button-save');
 		// Submit type of the button will trigger the submit event on entire form when clicked 
 		//(see submitHandler() in render() below).
 		this.submitButtonView.type = 'submit';
 
-		this.cancelButtonView = createButton(t('Cancel'), icons.cancel, 'ck-button-cancel');
+		this.cancelButtonView = createButton(locale, t('Cancel'), icons.cancel, 'ck-button-cancel');
 		this.cancelButtonView.delegate('execute').to(this, 'cancel');
 
 		this.setTemplate({

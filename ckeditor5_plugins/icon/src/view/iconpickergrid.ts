@@ -9,7 +9,6 @@ import { View } from 'ckeditor5/src/ui';
 import addKeyboardHandlingForGrid from '@ckeditor/ckeditor5-ui/src/bindings/addkeyboardhandlingforgrid';
 import IconPickerItem from './iconpickeritem';
 import { ButtonView } from 'ckeditor5/src/ui';
-import { icons } from 'ckeditor5/src/core';
 import type { FontAwesomeStyle, FontAwesomeVersion, CategoryDefinition, CategoryName, IconDefinition, IconDefinitions, IconName } from '../icontypes';
 
 export default class IconPickerGrid extends View implements FocusableView {
@@ -96,8 +95,9 @@ export default class IconPickerGrid extends View implements FocusableView {
 
 		this.expandButtonView = new ButtonView(locale);
 		this.expandButtonView.set({
-			icon: icons.plus,
-			label: t('Show More'),
+			icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><path d="M.941 4.523a.75.75 0 1 1 1.06-1.06l3.006 3.005 3.005-3.005a.75.75 0 1 1 1.06 1.06l-3.549 3.55a.75.75 0 0 1-1.168-.136L.941 4.523z"></path></svg>',
+			label: t('Expand'),
+			tooltip: t('Show more icons'),
 			withText: true,
 			isVisible: false,
 			class: 'ckeditor5-icons__grid-expand'
