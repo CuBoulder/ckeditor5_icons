@@ -20,21 +20,21 @@ export default class IconPickerFooter extends View {
 	 * 
 	 * @observable
 	 */
-	public iconName?: IconName | null;
+	public declare iconName?: IconName | null;
 
 	/**
 	 * The selected style of the currently selected icon.
 	 * 
 	 * @observable
 	 */
-	public iconStyle?: FontAwesomeStyle;
+	public declare iconStyle?: FontAwesomeStyle;
 
 	/**
 	 * The definition of the currently selected icon.
 	 * 
 	 * @observable
 	 */
-	public iconDefinition?: IconDefinition | null;
+	public declare iconDefinition?: IconDefinition | null;
 
 	/**
 	 * The search form view.

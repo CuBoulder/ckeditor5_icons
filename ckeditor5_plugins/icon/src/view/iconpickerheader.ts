@@ -81,7 +81,7 @@ export default class IconPickerHeader extends View implements FocusableView {
 				{
 					'tag': 'span',
 					children: [
-						{ text: bind.to('categoryAttributionName', (value => value === '_recommended' ? t('Recommended') : (faVersion === '5' ? 'Font Awesome 5' : 'Font Awesome 6') + (value ? ': ' + t(value === '_search' ? 'Search' : value === '_all' || value === '_brands' ? faCategories[value]!.label : 'Categories') : ''))) }
+						{ text: bind.to('categoryAttributionName', (value => value === '_recommended' ? t('Recommended') : (faVersion === '5' ? 'Font Awesome 5' : 'Font Awesome 6') + (value ? ': ' + t(value === '_search' ? 'Search' : value === '_all' || value === '_brands' ? faCategories[value]!.label : 'Category') : ''))) }
 					]
 				}
 			]

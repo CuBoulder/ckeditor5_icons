@@ -139,15 +139,22 @@ export default class IconPickerView extends View implements FocusableView {
 			this.gridView.refresh(categoryName, categoryDefinition, faIcons);
 			this.footerView.refresh();
 			this._stopTrackingFooterForm();
+			if (this.gridView.allCategoryFilterView.buttonView.isVisible)
+				this._startTracking(this.gridView.allCategoryFilterView.buttonView, this.items.getIndex(this.gridView));
+			else this._stopTracking(this.gridView.allCategoryFilterView.buttonView);
 		});
 
 		// Handles the icon selection event from the grid.
 		this.listenTo<IconSelectionEvent>(this.gridView, 'execute', (_eventInfo, iconName, iconDefinition) => {
-			this.set('iconName', iconName);
-			this.set('iconStyle', getValidIconStyle(iconDefinition, this.iconStyle));
-			this.set('iconDefinition', iconDefinition);
-			this.footerView.refresh();
-			this._startTrackingFooterForm();
+			if (!iconName || !iconDefinition)
+				this._clearSelectedIcon();
+			else {
+				this.set('iconName', iconName);
+				this.set('iconStyle', getValidIconStyle(iconDefinition, this.iconStyle));
+				this.set('iconDefinition', iconDefinition);
+				this.footerView.refresh();
+				this._startTrackingFooterForm();
+			}
 		});
 
 		// Tracks the "Show more" button in the grid view.

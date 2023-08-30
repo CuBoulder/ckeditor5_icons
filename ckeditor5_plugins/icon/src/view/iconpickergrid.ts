@@ -3,12 +3,13 @@
  */
 
 import type { Locale } from 'ckeditor5/src/utils';
-import { FocusTracker, KeystrokeHandler } from 'ckeditor5/src/utils';
-import type { FocusableView, ViewCollection } from 'ckeditor5/src/ui';
-import { View } from 'ckeditor5/src/ui';
+import type { ObservableChangeEvent } from 'ckeditor5/src/utils';
+import { Collection, FocusTracker, KeystrokeHandler } from 'ckeditor5/src/utils';
+import type { DropdownView, FocusableView, ListDropdownItemDefinition, ViewCollection } from 'ckeditor5/src/ui';
+import { Model, View, createDropdown } from 'ckeditor5/src/ui';
 import addKeyboardHandlingForGrid from '@ckeditor/ckeditor5-ui/src/bindings/addkeyboardhandlingforgrid';
 import IconPickerItem from './iconpickeritem';
-import { ButtonView } from 'ckeditor5/src/ui';
+import { ButtonView, addListToDropdown } from 'ckeditor5/src/ui';
 import type { FontAwesomeStyle, FontAwesomeVersion, CategoryDefinition, CategoryName, IconDefinition, IconDefinitions, IconName } from '../icontypes';
 
 export default class IconPickerGrid extends View implements FocusableView {
@@ -22,21 +23,38 @@ export default class IconPickerGrid extends View implements FocusableView {
 	 * 
 	 * @observable
 	 */
-	public iconName?: IconName | null;
+	public declare iconName?: IconName | null;
 
 	/**
 	 * The selected style of the currently selected icon.
 	 * 
 	 * @observable
 	 */
-	public iconStyle?: FontAwesomeStyle | null;
+	public declare iconStyle?: FontAwesomeStyle | null;
 
 	/**
 	 * The definition of the currently selected icon.
 	 * 
 	 * @observable
 	 */
-	public iconDefinition?: IconDefinition | null;
+	public declare iconDefinition?: IconDefinition | null;
+
+	/**
+	 * The value of the "All" filter.
+	 * 
+	 * @observable
+	 */
+	public declare allCategoryFilter: string;
+
+	/**
+	 * The "All" category filter dropdown.
+	 */
+	public readonly allCategoryFilterView: DropdownView;
+
+	/**
+	 * The "All" category filter dropdown items.
+	 */
+	private allCategoryFilterViewItems?: Collection<ListDropdownItemDefinition>;
 
 	/**
 	 * The view containing the grid's sections.
@@ -44,7 +62,7 @@ export default class IconPickerGrid extends View implements FocusableView {
 	public readonly itemsView: View;
 
 	/**
-	 * The "Show More" button view.
+	 * The "Expand" button view.
 	 */
 	public readonly expandButtonView: ButtonView;
 
@@ -80,10 +98,14 @@ export default class IconPickerGrid extends View implements FocusableView {
 		super(locale);
 		this.faVersion = faVersion;
 
+		this.set('allCategoryFilter', 'a');
+
 		const t = locale.t;
 
 		this.items = this.createCollection();
 		this.sections = this.createCollection();
+
+		this.allCategoryFilterView = this._createAllCategoryFilterDropdown(locale);
 
 		this.itemsView = new View();
 		this.itemsView.setTemplate({
@@ -109,13 +131,28 @@ export default class IconPickerGrid extends View implements FocusableView {
 				class: ['ck', 'ckeditor5-icons__grid']
 			},
 			children: [
-				this.itemsView,
 				{
 					tag: 'div',
 					attributes: {
-						class: ['ck', 'ckeditor5-icons__grid-options', this.expandButtonView.bindTemplate.to('isVisible', value => value ? '' : 'ck-hidden')]
+						class: ['ck', 'ckeditor5-icons__grid-options', 'ckeditor5-icons__grid-options-top', this.allCategoryFilterView.buttonView.bindTemplate.to('isVisible', value => value ? '' : 'ck-hidden')]
 					},
-					children: [this.expandButtonView]
+					children: [this.allCategoryFilterView]
+				},
+				{
+					tag: 'div',
+					attributes: {
+						class: ['ck', 'ckeditor5-icons__grid-scrollable']
+					},
+					children: [
+						this.itemsView,
+						{
+							tag: 'div',
+							attributes: {
+								class: ['ck', 'ckeditor5-icons__grid-options', 'ckeditor5-icons__grid-options-bottom', this.expandButtonView.bindTemplate.to('isVisible', value => value ? '' : 'ck-hidden')]
+							},
+							children: [this.expandButtonView]
+						}
+					]
 				}
 			]
 		});
@@ -172,6 +209,19 @@ export default class IconPickerGrid extends View implements FocusableView {
 
 		if (searchQuery)
 			iconNames = searchResults(iconNames, iconDefinitions, searchQuery);
+		if (!searchQuery && categoryName === '_all') {
+			const allCategoryFilter = this.allCategoryFilter;
+			iconNames = allCategoryFilter === '#' ? iconNames.filter(iconName => '0123456789'.includes(iconName[0]!)) : iconNames.filter(iconName => iconName[0] === allCategoryFilter[0]);
+			if (!this.allCategoryFilterViewItems) {
+				this.allCategoryFilterViewItems = this._createAllCategoryFilterDropdownItems();
+				addListToDropdown(this.allCategoryFilterView, this.allCategoryFilterViewItems);
+				this.on<ObservableChangeEvent>('change:allCategoryFilter', () => {
+					this.refresh(categoryName, categoryDefinition, iconDefinitions, searchQuery);
+					this.fire<IconSelectionEvent>('execute', null, null);
+				});
+			}
+			this.allCategoryFilterView.buttonView.isVisible = true;
+		} else this.allCategoryFilterView.buttonView.isVisible = false;
 
 		this._populateGrid(iconNames, iconDefinitions);
 	}
@@ -267,6 +317,49 @@ export default class IconPickerGrid extends View implements FocusableView {
 			this.fire<GridSectionLoadEvent>('gridSectionLoad', false);
 		}
 	}
+
+	/**
+	 * @param locale
+	 *   The locale.
+	 * @returns
+	 *   The "all" category filter dropdown view.
+	 */
+	private _createAllCategoryFilterDropdown(locale: Locale): DropdownView {
+		const dropdownView = createDropdown(locale), t = locale.t;
+
+		dropdownView.buttonView.set({
+			tooltip: t('Filter All'),
+			withText: true,
+			isVisible: false,
+			class: 'ck-dropdown__button_label-width_auto'
+		});
+
+		dropdownView.buttonView.bind('label').to(this, 'allCategoryFilter', value => value.toUpperCase());
+		dropdownView.panelView.extendTemplate({ attributes: { tabindex: '-1' } }); // Prevents grabbing the scrollbar from closing the panel.
+		dropdownView.on('execute', eventInfo => this.set('allCategoryFilter', eventInfo.source['name'] as string));
+
+		return dropdownView;
+	}
+
+	/**
+	 * @returns
+	 *   The "all" category filter dropdown items.
+	 */
+	private _createAllCategoryFilterDropdownItems(): Collection<ListDropdownItemDefinition> {
+		const items = new Collection<ListDropdownItemDefinition>();
+
+		for (const name of '#abcdefghijklmnopqrstuvwxyz') {
+			const model = new Model({
+				name,
+				label: name.toUpperCase(),
+				withText: true
+			});
+			model.bind('isOn').to(this, 'allCategoryFilter', value => value === name);
+			items.add({ type: 'button', model });
+		}
+
+		return items;
+	}
 }
 
 /**
@@ -308,7 +401,7 @@ function searchResults(iconNames: IconName[], iconDefinitions: IconDefinitions, 
  */
 export type IconSelectionEvent = {
 	name: 'execute';
-	args: [iconName: IconName, IconDefinition: IconDefinition];
+	args: [iconName: IconName | null, IconDefinition: IconDefinition | null];
 };
 
 /**

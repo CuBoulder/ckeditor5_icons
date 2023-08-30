@@ -22,7 +22,7 @@ export default class IconPickerForm extends View {
 	 * 
 	 * @observable
 	 */
-	public iconStyle?: FontAwesomeStyle;
+	public declare iconStyle?: FontAwesomeStyle;
 
 	/**
 	 * The style selection dropdown view.
