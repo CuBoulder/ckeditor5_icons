@@ -22,7 +22,7 @@ export default class IconPickerFAIcon extends View {
 	 * @param iconStyle
 	 *   The preferred style to display the icon in (optional).
 	 */
-	public constructor(locale: Locale, faVersion: FontAwesomeVersion, iconName: IconName, iconDefinition: IconDefinition, iconStyle?: FontAwesomeStyle) {
+	public constructor(locale: Locale, faVersion: FontAwesomeVersion, iconName: IconName, iconDefinition: IconDefinition, iconStyle?: FontAwesomeStyle | null) {
 		super(locale);
 
 		this.setTemplate({

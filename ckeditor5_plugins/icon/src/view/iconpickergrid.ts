@@ -19,6 +19,20 @@ export default class IconPickerGrid extends View implements FocusableView {
 	private readonly faVersion: FontAwesomeVersion;
 
 	/**
+	 * The name of the currently selected category.
+	 * 
+	 * @observable
+	 */
+	public declare categoryName?: CategoryName | null;
+
+	/**
+	 * The definiton of the currently selected category.
+	 * 
+	 * @observable
+	 */
+	public declare categoryDefinition?: CategoryDefinition | null;
+
+	/**
 	 * The name of the currently selected icon.
 	 * 
 	 * @observable
@@ -26,18 +40,18 @@ export default class IconPickerGrid extends View implements FocusableView {
 	public declare iconName?: IconName | null;
 
 	/**
-	 * The selected style of the currently selected icon.
-	 * 
-	 * @observable
-	 */
-	public declare iconStyle?: FontAwesomeStyle | null;
-
-	/**
 	 * The definition of the currently selected icon.
 	 * 
 	 * @observable
 	 */
 	public declare iconDefinition?: IconDefinition | null;
+
+	/**
+	 * The style to filter icons in the grid by.
+	 * 
+	 * @observable
+	 */
+	public declare styleFilter?: FontAwesomeStyle | 'all';
 
 	/**
 	 * The value of the "All" filter.
@@ -180,7 +194,7 @@ export default class IconPickerGrid extends View implements FocusableView {
 	 *   An IconPickerItem created based on the provded icon.
 	 */
 	private _createItem(iconName: IconName, iconDefinition: IconDefinition): IconPickerItem {
-		const item = new IconPickerItem(this.locale!, this.faVersion, iconName, iconDefinition);
+		const item = new IconPickerItem(this.locale!, this.faVersion, iconName, iconDefinition, !this.styleFilter || this.styleFilter === 'all' ? null : this.styleFilter as FontAwesomeStyle);
 
 		// Attaches events to the grid item.
 		item.on('mouseover', () => this.fire<IconHoverEvent>('itemHover', iconName, iconDefinition));
@@ -194,34 +208,41 @@ export default class IconPickerGrid extends View implements FocusableView {
 	/**
 	 * Refreshes this icon picker grid based on a category selection.
 	 */
-	public refresh(categoryName: CategoryName, categoryDefinition: CategoryDefinition, iconDefinitions: IconDefinitions, searchQuery?: string) {
+	public refresh(iconDefinitions: IconDefinitions, categoryName?: CategoryName | null, categoryDefinition?: CategoryDefinition | null, searchQuery?: string | null) {
+		const categoryName_ = categoryName || this.categoryName, categoryDefinition_ = categoryDefinition || this.categoryDefinition;
+
 		this.items.clear();
 		this.itemsView.deregisterChild(this.sections);
 		this.itemsView.element!.innerText = '';
 		this.sections.clear();
 
 		let iconNames: IconName[];
-		if (categoryName === '_all')
+		if (categoryName_ === '_all')
 			iconNames = Object.keys(iconDefinitions);
-		else if (categoryName === '_brands')
+		else if (categoryName_ === '_brands')
 			iconNames = Object.keys(iconDefinitions).filter(value => iconDefinitions[value]!.styles.includes('brands'));
-		else iconNames = categoryDefinition.icons;
+		else if (categoryDefinition_) 
+			iconNames = categoryDefinition_.icons;
+		else iconNames = [];
 
 		if (searchQuery)
 			iconNames = searchResults(iconNames, iconDefinitions, searchQuery);
-		if (!searchQuery && categoryName === '_all') {
+		if (!searchQuery && categoryName_ === '_all') { // Enables the alphabetical filtering of the "All" category.
 			const allCategoryFilter = this.allCategoryFilter;
 			iconNames = allCategoryFilter === '#' ? iconNames.filter(iconName => '0123456789'.includes(iconName[0]!)) : iconNames.filter(iconName => iconName[0] === allCategoryFilter[0]);
 			if (!this.allCategoryFilterViewItems) {
 				this.allCategoryFilterViewItems = this._createAllCategoryFilterDropdownItems();
 				addListToDropdown(this.allCategoryFilterView, this.allCategoryFilterViewItems);
 				this.on<ObservableChangeEvent>('change:allCategoryFilter', () => {
-					this.refresh(categoryName, categoryDefinition, iconDefinitions, searchQuery);
+					this.refresh(iconDefinitions);
 					this.fire<IconSelectionEvent>('execute', null, null);
 				});
 			}
 			this.allCategoryFilterView.buttonView.isVisible = true;
 		} else this.allCategoryFilterView.buttonView.isVisible = false;
+
+		if (categoryName_ !== '_brands' && this.styleFilter && this.styleFilter !== 'all') // Enables filtering by style.
+			iconNames = iconNames.filter(iconName => iconDefinitions[iconName]?.styles.includes(this.styleFilter! as FontAwesomeStyle));
 
 		this._populateGrid(iconNames, iconDefinitions);
 	}

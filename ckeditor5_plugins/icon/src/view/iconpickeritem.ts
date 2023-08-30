@@ -5,7 +5,7 @@
 import type { Locale } from 'ckeditor5/src/utils';
 import { ButtonView } from 'ckeditor5/src/ui';
 import IconPickerFAIcon from './iconpickerfaicon';
-import type { FontAwesomeVersion, IconDefinition, IconName } from '../icontypes';
+import type { FontAwesomeStyle, FontAwesomeVersion, IconDefinition, IconName } from '../icontypes';
 
 export default class IconPickerItem extends ButtonView {
 	/**
@@ -25,7 +25,7 @@ export default class IconPickerItem extends ButtonView {
 	 * @param iconDefinition
 	 *   The defintion of the icon this button is for.
 	 */
-	public constructor(locale: Locale, faVersion: FontAwesomeVersion, iconName: IconName, iconDefinition: IconDefinition) {
+	public constructor(locale: Locale, faVersion: FontAwesomeVersion, iconName: IconName, iconDefinition: IconDefinition, iconStyle: FontAwesomeStyle | null) {
 		super(locale);
 
 		const bind = this.bindTemplate;
@@ -37,7 +37,7 @@ export default class IconPickerItem extends ButtonView {
 			withText: true
 		});
 
-		this.faIcon = new IconPickerFAIcon(locale, faVersion, iconName, iconDefinition);
+		this.faIcon = new IconPickerFAIcon(locale, faVersion, iconName, iconDefinition, iconStyle);
 		this.faIcon.extendTemplate({
 			attributes: {
 				class: [

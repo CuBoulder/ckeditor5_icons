@@ -2,12 +2,15 @@
  * @file contains the icon picker icon for FontAwesome icons.
  */
 
-import type { Locale } from 'ckeditor5/src/utils';
-import { View } from 'ckeditor5/src/ui';
+import { Collection, type Locale } from 'ckeditor5/src/utils';
+import type { DropdownView, ListDropdownItemDefinition } from 'ckeditor5/src/ui';
+import { Model, View, addListToDropdown, createDropdown } from 'ckeditor5/src/ui';
 import IconPickerFAIcon from './iconpickerfaicon';
+import type { ChangeStyleEvent } from './iconpickerform';
 import IconPickerForm from './iconpickerform';
 import IconPickerSearch from './iconpickersearch';
 import type { FontAwesomeStyle, FontAwesomeVersion, IconDefinition, IconName } from '../icontypes';
+import { faStyleLabels } from '../iconconfig';
 
 export default class IconPickerFooter extends View {
 	/**
@@ -37,9 +40,21 @@ export default class IconPickerFooter extends View {
 	public declare iconDefinition?: IconDefinition | null;
 
 	/**
+	 * The style to filter icons in the grid by.
+	 * 
+	 * @observable
+	 */
+	public declare styleFilter: FontAwesomeStyle | 'all';
+
+	/**
 	 * The search form view.
 	 */
 	public readonly searchView: IconPickerSearch;
+
+	/**
+	 * The style filter dropdown view.
+	 */
+	public readonly styleFilterView: DropdownView;
 
 	/**
 	 * The selected icon preview view.
@@ -61,17 +76,23 @@ export default class IconPickerFooter extends View {
 	 * 
 	 * @param locale
 	 *   The locale.
+	 * @param faStyles
+	 *   The enabled Font Awesome icon styles.
 	 * @param faVersion
 	 *   The version of Font Awesome being used.
 	 */
-	public constructor(locale: Locale, faVersion: FontAwesomeVersion) {
+	public constructor(locale: Locale, faVersion: FontAwesomeVersion, faStyles: FontAwesomeStyle[]) {
 		super(locale);
 		this.faVersion = faVersion;
+
+		this.set('styleFilter', 'all');
 
 		const t = locale.t, bind = this.bindTemplate;
 
 		this.searchView = new IconPickerSearch(locale);
 		this.searchView.delegate('search').to(this);
+
+		this.styleFilterView = this._createStyleFilterDropdown(locale, faStyles);
 
 		this.iconPreviewView = new View();
 		this.iconPreviewView.setTemplate({
@@ -139,7 +160,8 @@ export default class IconPickerFooter extends View {
 						class: ['ck', bind.to('iconName', value => value ? 'ck-hidden' : '')]
 					},
 					children: [
-						this.searchView
+						this.searchView,
+						this.styleFilterView
 					]
 				}
 			]
@@ -168,5 +190,56 @@ export default class IconPickerFooter extends View {
 		}
 
 		this.faIcon = faIcon;
+	}
+
+	/**
+	 * @param locale
+	 *   The locale.
+	 * @param faStyles
+	 *   The enabled Font Awesome icon styles.
+	 * @returns
+	 *   The style filter dropdown.
+	 */
+	private _createStyleFilterDropdown(locale: Locale, faStyles: FontAwesomeStyle[]): DropdownView {
+		const dropdownView = createDropdown(locale), defaultLabel = 'Select a style', t = locale.t;
+
+		dropdownView.buttonView.set({
+			label: t(defaultLabel),
+			tooltip: t('Filter by Style'),
+			withText: true,
+			class: 'ck-dropdown__button_label-width_auto'
+		});
+		dropdownView.buttonView.bind('label').to(this, 'styleFilter', value => value === 'all' ? t('All') : faStyleLabels[value as FontAwesomeStyle]);
+		dropdownView.on('execute', eventInfo => {
+			const styleFilter = eventInfo.source['name'] as FontAwesomeStyle | 'all';
+			this.set('styleFilter', styleFilter);
+			if (styleFilter !== 'all')
+				this.formView.fire<ChangeStyleEvent>('changeStyle', styleFilter);
+		});
+
+		const items = new Collection<ListDropdownItemDefinition>();
+
+		const model = new Model({
+			name: 'all',
+			label: t('All'),
+			withText: true
+		});
+		model.bind('isOn').to(this, 'styleFilter', value => value === 'all');
+		items.add({ type: 'button', model });
+		items.add({ type: 'separator' });
+
+		for (const name of faStyles) {
+			const model = new Model({
+				name,
+				label: faStyleLabels[name],
+				withText: true
+			});
+			model.bind('isOn').to(this, 'styleFilter', value => value === name);
+			items.add({ type: 'button', model });
+		}
+
+		addListToDropdown(dropdownView, items);
+
+		return dropdownView;
 	}
 }

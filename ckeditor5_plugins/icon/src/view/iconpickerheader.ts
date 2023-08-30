@@ -69,7 +69,7 @@ export default class IconPickerHeader extends View implements FocusableView {
 		this.categoryDropdownView.panelPosition = locale.uiLanguageDirection === 'rtl' ? 'se' : 'sw';
 
 		this.attributionIconView = new View(locale);
-		this.attributionIconView.setTemplate({ tag: 'span', attributes: { class: ['ck', bind.to('categoryAttributionName', (value => value === '_recommended' ? 'ck-hidden' : ''))] } });
+		this.attributionIconView.setTemplate({ tag: 'span', attributes: { class: ['ck', bind.to('categoryAttributionName', (value => value === '_recommended' || value === '_search' ? 'ck-hidden' : ''))] } });
 		this.attributionView = new View(locale);
 		this.attributionView.setTemplate({
 			tag: 'div',
@@ -81,7 +81,7 @@ export default class IconPickerHeader extends View implements FocusableView {
 				{
 					'tag': 'span',
 					children: [
-						{ text: bind.to('categoryAttributionName', (value => value === '_recommended' ? t('Recommended') : (faVersion === '5' ? 'Font Awesome 5' : 'Font Awesome 6') + (value ? ': ' + t(value === '_search' ? 'Search' : value === '_all' || value === '_brands' ? faCategories[value]!.label : 'Category') : ''))) }
+						{ text: bind.to('categoryAttributionName', (value => value === '_recommended' ? t('Recommended') :  value === '_search' ? t('Search') : (faVersion === '5' ? 'Font Awesome 5' : 'Font Awesome 6'))) }
 					]
 				}
 			]

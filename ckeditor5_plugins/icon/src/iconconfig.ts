@@ -11,6 +11,7 @@ import { icons } from 'ckeditor5/src/core';
 export interface IconConfig {
 	faVersion?: FontAwesomeVersion;
 	faCategories?: CategoryDefinitions;
+	faStyles?: FontAwesomeStyle[];
 	faIcons?: IconDefinitions;
 	recommendedIcons?: IconName[] | null;
 };

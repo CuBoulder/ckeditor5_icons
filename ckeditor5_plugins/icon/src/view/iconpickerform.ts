@@ -88,7 +88,7 @@ export default class IconPickerForm extends View {
 		for (const name of iconDefinition.styles) {
 			const model = new Model({
 				name,
-				label: this.locale!.t(faStyleLabels[name]),
+				label: faStyleLabels[name],
 				withText: true
 			});
 			model.bind('isOn').to(this, 'iconStyle', value => value === name);
@@ -132,10 +132,7 @@ export default class IconPickerForm extends View {
 			withText: true,
 			class: 'ck-dropdown__button_label-width_auto'
 		});
-		dropdownView.buttonView.bind('label').to(this, 'iconStyle', value => {
-			const style: string | undefined = faStyleLabels[value!];
-			return style ? t(style) : t(defaultLabel);
-		});
+		dropdownView.buttonView.bind('label').to(this, 'iconStyle', value => faStyleLabels[value!]);
 		dropdownView.on('execute', eventInfo => this.fire<ChangeStyleEvent>('changeStyle', eventInfo.source['name'] as FontAwesomeStyle));
 
 		return dropdownView;
