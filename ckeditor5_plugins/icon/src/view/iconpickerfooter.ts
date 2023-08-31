@@ -11,6 +11,7 @@ import IconPickerForm from './iconpickerform';
 import IconPickerSearch from './iconpickersearch';
 import type { FontAwesomeStyle, FontAwesomeVersion, IconDefinition, IconName } from '../icontypes';
 import { faStyleLabels } from '../iconconfig';
+import HideableView from './hideableview';
 
 export default class IconPickerFooter extends View {
 	/**
@@ -94,6 +95,9 @@ export default class IconPickerFooter extends View {
 
 		this.styleFilterView = this._createStyleFilterDropdown(locale, faStyles);
 
+		const styleFilterContainerView = new HideableView(locale, 'div', [this.styleFilterView]);
+		styleFilterContainerView.bind('isVisible').to(this.styleFilterView.buttonView, 'isVisible');
+
 		this.iconPreviewView = new View();
 		this.iconPreviewView.setTemplate({
 			tag: 'div',
@@ -117,7 +121,7 @@ export default class IconPickerFooter extends View {
 				{
 					tag: 'div',
 					attributes: {
-						class: ['ck', 'ckeditor5-icons__footer-flex', bind.to('iconName', value => value ? '' : 'ck-hidden')]
+						class: ['ck', bind.to('iconName', value => value ? '' : 'ck-hidden')]
 					},
 					children: [
 						{
@@ -159,10 +163,7 @@ export default class IconPickerFooter extends View {
 					attributes: {
 						class: ['ck', bind.to('iconName', value => value ? 'ck-hidden' : '')]
 					},
-					children: [
-						this.searchView,
-						this.styleFilterView
-					]
+					children: [this.searchView, styleFilterContainerView]
 				}
 			]
 		});

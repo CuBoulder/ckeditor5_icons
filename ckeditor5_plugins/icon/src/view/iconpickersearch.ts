@@ -8,6 +8,7 @@ import { createLabeledInputText, LabeledFieldView, View } from 'ckeditor5/src/ui
 import type { InputViewInputEvent } from '@ckeditor/ckeditor5-ui/src/input/inputview';
 import { createButton } from './viewutils';
 import { icons } from 'ckeditor5/src/core';
+import HideableView from './hideableview';
 
 export default class IconPickerSearch extends View {
 	/**
@@ -51,12 +52,15 @@ export default class IconPickerSearch extends View {
 			this.searchFieldView.focus();
 		});
 
+		const searchClearButtonContainerView = new HideableView(locale, 'div', [this.clearButtonView]);
+		searchClearButtonContainerView.bind('isVisible').to(this.clearButtonView, 'isVisible');
+
 		this.setTemplate({
 			tag: 'form',
 			attributes: {
 				class: ['ck', 'ckeditor5-icons__picker-search']
 			},
-			children: [this.searchFieldView, this.clearButtonView]
+			children: [this.searchFieldView, searchClearButtonContainerView]
 		});
 	}
 }

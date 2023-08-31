@@ -40,11 +40,7 @@ export default class IconPickerItem extends ButtonView {
 		this.faIcon = new IconPickerFAIcon(locale, faVersion, iconName, iconDefinition, iconStyle);
 		this.faIcon.extendTemplate({
 			attributes: {
-				class: [
-					'ck-icon',
-					'ck-button__icon',
-					'ck-icon_inherit-color'
-				]
+				class: ['ck-icon', 'ck-button__icon', 'ck-icon_inherit-color']
 			}
 		});
 

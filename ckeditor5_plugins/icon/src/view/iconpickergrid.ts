@@ -136,7 +136,7 @@ export default class IconPickerGrid extends View implements FocusableView {
 			}
 		});
 
-		this.fallbackView = new HideableView(locale, 'div', [{ text: bind.to('styleFilter', value => !value || value === 'all' ? t('No icons match your search.') : t('No icons in the %0 style match your search.', [faStyleLabels[value as FontAwesomeStyle]])) }]);
+		this.fallbackView = new HideableView(locale, 'div', [{ text: bind.to('styleFilter', value => !value || value === 'all' ? t('No icons match your search.') : t('No icons in the "%0" style match your search.', [faStyleLabels[value as FontAwesomeStyle]])) }]);
 		this.fallbackView.extendTemplate({
 			attributes: {
 				class: 'ckeditor5-icons__grid-fallback'
