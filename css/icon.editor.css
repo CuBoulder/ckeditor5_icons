@@ -1,9 +1,17 @@
+.ck .ck.ckeditor5-icons__picker {
+	width: var(--ck-dropdown-max-width);
+	max-width: 350px;
+}
+
 .ck .ck.ck-icon.ckeditor5-icons__icon {
 	text-align: center;
 }
 
 .ck .ck.ckeditor5-icons__picker-header {
-	height: 48px;
+	flex-wrap: wrap;
+	grid-gap: var(--ck-spacing-standard);
+	min-height: 48px;
+	height: auto;
 	padding: var(--ck-spacing-small) var(--ck-spacing-large);
 }
 
@@ -22,12 +30,8 @@
 	max-height: 350px;
 }
 
-.ck .ck.ckeditor5-icons__grid {
-	min-width: 350px;
-}
-
 .ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-scrollable {
-	max-height: calc((var(--ck-icon-size) + var(--ck-spacing-tiny) * 2 + var(--ck-spacing-standard)) * 6 + var(--ck-spacing-standard) * 2);
+	max-height: calc((var(--ck-icon-size) + var(--ck-spacing-tiny) * 2 + var(--ck-spacing-standard)) * 5 + var(--ck-spacing-standard) * 2);
 	overflow-x: hidden;
 	overflow-y: auto;
 }
@@ -87,29 +91,37 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	height: 48px;
+	flex-flow: row wrap;
+	grid-gap: var(--ck-spacing-standard);
+	min-height: 48px;
 	border-top: 1px solid var(--ck-color-base-border);
 	padding: var(--ck-spacing-small) var(--ck-spacing-large);
 }
 
+.ck .ck.ckeditor5-icons__picker-footer > div > * {
+	flex: 1 1 auto;
+}
+
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-search {
 	display: flex;
-	flex: 1 1 auto;
 	flex-direction: row;
 	align-items: center;
 }
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-search .ck.ck-labeled-field-view {
-	flex: 1 1 auto;
+	flex: 1;
 }
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-search .ck.ck-input {
 	min-width: 100%;
 }
 
-.ck .ck.ckeditor5-icons__picker-footer > div .ck.ck-dropdown__button {
+.ck .ck.ckeditor5-icons__picker-footer > div > .ck.ck-dropdown {
+	text-align: right;
+}
+
+.ck .ck.ckeditor5-icons__picker-footer > div > .ck.ck-dropdown .ck.ck-dropdown__button {
 	width: auto;
-	margin-left: var(--ck-spacing-standard);
 }
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ckeditor5-icons__icon-info {
@@ -119,6 +131,13 @@
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon-info > .ck.ckeditor5-icons__icon-name {
 	font-size: var(--ck-font-size-small);
+}
+
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-form {
+	display: flex;
+	flex-direction: row;
+	grid-gap: var(--ck-spacing-tiny);
+	justify-content: right;
 }
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-search > .ck.ck-button {
@@ -159,6 +178,8 @@
 	display: flex;
 	flex-direction: row;
 	align-items: center;
+	grid-gap: var(--ck-spacing-small);
+	flex-wrap: wrap;
 }
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon {
@@ -166,7 +187,6 @@
 	width: var(--ck-font-size-large);
 	height: var(--ck-font-size-large);
 	text-align: center;
-	margin-right: var(--ck-spacing-small);
 }
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon::after {
