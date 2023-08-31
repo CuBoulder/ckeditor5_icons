@@ -15,21 +15,21 @@ export default class IconPickerHeader extends View implements FocusableView {
 	 * 
 	 * @observable
 	 */
-	public declare categoryName: CategoryName | null;
+	public declare categoryName?: CategoryName;
 
 	/**
 	 * The attribution name of the currently selected category.
 	 * 
 	 * @observable
 	 */
-	public declare categoryAttributionName: CategoryName | null | '_search';
+	public declare categoryAttributionName?: CategoryName | '_search';
 
 	/**
 	 * The definiton of the currently selected category.
 	 * 
 	 * @observable
 	 */
-	public declare categoryDefinition: CategoryDefinition | null;
+	public declare categoryDefinition?: CategoryDefinition;
 
 	/**
 	 * The Font Awesome icon view.

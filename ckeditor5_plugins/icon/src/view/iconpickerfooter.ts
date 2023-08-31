@@ -205,7 +205,7 @@ export default class IconPickerFooter extends View {
 
 		dropdownView.buttonView.set({
 			label: t(defaultLabel),
-			tooltip: t('Filter by Style'),
+			tooltip: t('Filter by style'),
 			withText: true,
 			class: 'ck-dropdown__button_label-width_auto'
 		});

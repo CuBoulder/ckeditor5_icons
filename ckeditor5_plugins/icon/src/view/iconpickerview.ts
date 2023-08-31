@@ -185,19 +185,20 @@ export default class IconPickerView extends View implements FocusableView {
 			if (searchQuery) {
 				this.gridView.refresh(faIcons, '_all', faCategories['_all']!, searchQuery);
 				this.headerView.set('categoryAttributionName', '_search');
-				this.headerView.categoryDropdownView.buttonView.set('isVisible', false);
+				this.headerView.categoryDropdownView.buttonView.isVisible = false;
 				this._stopTracking(this.headerView);
 				searchClearButtonView.isVisible = true;
-				this._startTracking(searchClearButtonView);
+				this._startTracking(searchClearButtonView, this.items.getIndex(this.searchFieldView) + 1);
+				this.footerView.styleFilterView.buttonView.isVisible = true;
+				this._startTracking(this.footerView.styleFilterView.buttonView);
+				searchQuery_ = searchQuery;
 			} else {
-				this.gridView.refresh(faIcons);
-				this.headerView.set('categoryAttributionName', this.headerView.categoryName);
-				this.headerView.categoryDropdownView.buttonView.set('isVisible', true);
-				this._startTracking(this.headerView, 0);
+				this.headerView.fire<CategorySelectionEvent>('execute', this.headerView.categoryName!, this.headerView.categoryDefinition!);
 				searchClearButtonView.isVisible = false;
 				this._stopTracking(searchClearButtonView);
+				this.headerView.categoryDropdownView.buttonView.isVisible = true;
+				this._startTracking(this.headerView, 0);
 			}
-			searchQuery_ = searchQuery;
 		});
 
 		this.listenTo<ObservableChangeEvent>(this.gridView, 'change:styleFilter', () => {

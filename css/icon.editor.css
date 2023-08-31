@@ -87,7 +87,6 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	grid-gap: var(--ck-spacing-standard);
 	height: 48px;
 	border-top: 1px solid var(--ck-color-base-border);
 	padding: var(--ck-spacing-small) var(--ck-spacing-large);
@@ -98,7 +97,6 @@
 	flex: 1 1 auto;
 	flex-direction: row;
 	align-items: center;
-	grid-gap: var(--ck-spacing-tiny);
 }
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-search .ck.ck-labeled-field-view {
@@ -107,6 +105,11 @@
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-search .ck.ck-input {
 	min-width: 100%;
+}
+
+.ck .ck.ckeditor5-icons__picker-footer > div .ck.ck-dropdown__button {
+	width: auto;
+	margin-left: var(--ck-spacing-standard);
 }
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ckeditor5-icons__icon-info {
@@ -120,6 +123,7 @@
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-search > .ck.ck-button {
 	height: 1em;
+	margin-left: var(--ck-spacing-tiny);
 }
 
 .ck .ck.ckeditor5-icons__picker-header > div .ck.ckeditor5-icons__library-attr span {

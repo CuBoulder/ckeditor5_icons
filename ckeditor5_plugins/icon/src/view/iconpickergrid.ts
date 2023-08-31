@@ -5,13 +5,14 @@
 import type { Locale } from 'ckeditor5/src/utils';
 import type { ObservableChangeEvent } from 'ckeditor5/src/utils';
 import { Collection, CollectionChangeEvent, FocusTracker, KeystrokeHandler } from 'ckeditor5/src/utils';
-import type { DropdownView, FocusableView, ListDropdownItemDefinition, ViewCollection } from 'ckeditor5/src/ui';
+import type { ButtonExecuteEvent, DropdownView, FocusableView, ListDropdownItemDefinition, ViewCollection } from 'ckeditor5/src/ui';
 import { Model, View, createDropdown } from 'ckeditor5/src/ui';
 import addKeyboardHandlingForGrid from '@ckeditor/ckeditor5-ui/src/bindings/addkeyboardhandlingforgrid';
 import IconPickerItem from './iconpickeritem';
 import { ButtonView, addListToDropdown } from 'ckeditor5/src/ui';
 import type { FontAwesomeStyle, FontAwesomeVersion, CategoryDefinition, CategoryName, IconDefinition, IconDefinitions, IconName } from '../icontypes';
 import HideableView from './hideableview';
+import { faStyleLabels } from '../iconconfig';
 
 export default class IconPickerGrid extends View implements FocusableView {
 	/**
@@ -120,7 +121,7 @@ export default class IconPickerGrid extends View implements FocusableView {
 
 		this.set('allCategoryFilter', 'a');
 
-		const t = locale.t;
+		const bind = this.bindTemplate, t = locale.t;
 
 		this.items = this.createCollection();
 		this.sections = this.createCollection();
@@ -135,7 +136,7 @@ export default class IconPickerGrid extends View implements FocusableView {
 			}
 		});
 
-		this.fallbackView = new HideableView(locale, 'div', [{ text: t('No icons match your search.') }]);
+		this.fallbackView = new HideableView(locale, 'div', [{ text: bind.to('styleFilter', value => !value || value === 'all' ? t('No icons match your search.') : t('No icons in the %0 style match your search.', [faStyleLabels[value as FontAwesomeStyle]])) }]);
 		this.fallbackView.extendTemplate({
 			attributes: {
 				class: 'ckeditor5-icons__grid-fallback'
@@ -259,9 +260,11 @@ export default class IconPickerGrid extends View implements FocusableView {
 		if (categoryName_ !== '_brands' && this.styleFilter && this.styleFilter !== 'all') // Enables filtering by style.
 			iconNames = iconNames.filter(iconName => iconDefinitions[iconName]?.styles.includes(this.styleFilter! as FontAwesomeStyle));
 
-		if (iconNames.length === 0)
+		if (iconNames.length === 0) {
 			this.fallbackView.isVisible = true;
-		else {
+			this.expandButtonView.isVisible = false;
+			this.fire<GridSectionLoadEvent>('gridSectionLoad', false, false);
+		} else {
 			this.fallbackView.isVisible = false;
 			this._populateGrid(iconNames, iconDefinitions);
 		}
@@ -354,14 +357,14 @@ export default class IconPickerGrid extends View implements FocusableView {
 			this.itemsView.element.appendChild(section.element!);
 
 		if (length > max) {
-			buttonView.set('isVisible', true);
-			this.listenTo(buttonView, 'execute', () => {
+			buttonView.isVisible = true;
+			this.listenTo<ButtonExecuteEvent>(buttonView, 'execute', () => {
 				this.items.last!.focus();
 				this._populateGrid(iconNames, iconDefinitions, startAt + max);
 			});
 			this.fire<GridSectionLoadEvent>('gridSectionLoad', !this.fallbackView.isVisible, true);
 		} else {
-			buttonView.set('isVisible', false);
+			buttonView.isVisible = false;
 			this.fire<GridSectionLoadEvent>('gridSectionLoad', !this.fallbackView.isVisible, false);
 		}
 	}
