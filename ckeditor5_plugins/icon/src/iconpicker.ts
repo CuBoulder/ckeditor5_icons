@@ -24,9 +24,11 @@ export default class IconPicker extends Plugin implements PluginInterface {
 		const faVersion: FontAwesomeVersion = config.get('icon.faVersion') || '6';
 		const faCategories: CategoryDefinitions = config.get('icon.faCategories') || {};
 		const faIcons: IconDefinitions = config.get('icon.faIcons') || {};
-		const faStyles: FontAwesomeStyle[] = config.get('icon.faStyles') || ['solid', 'regular', 'brands'];
+		const faStyles: FontAwesomeStyle[] | undefined = config.get('icon.faStyles');
 		const recommendedIcons: IconName[] | null | undefined = config.get('icon.recommendedIcons');
-		const styles: FontAwesomeStyle[] = (Object.keys(faStyleLabels) as FontAwesomeStyle[]).filter(value => faStyles.includes(value));
+		let styles: FontAwesomeStyle[] = (Object.keys(faStyleLabels) as FontAwesomeStyle[]);
+		if (faStyles)
+			styles = styles.filter(value => faStyles.includes(value));
 
 		// Registers the icon toolbar button.
 		componentFactory.add('icon', locale => {

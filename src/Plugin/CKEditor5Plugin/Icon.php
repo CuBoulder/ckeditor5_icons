@@ -67,6 +67,7 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 	public function defaultConfiguration() {
 		return [
 			'fa_version' => '6',
+			'fa_styles' => ['solid', 'regular', 'brands'],
 			'recommended_enabled' => FALSE,
 			'recommended_icons' => ['drupal', 'plus', 'font-awesome', 'equals', 'heart']
 		];
@@ -132,6 +133,7 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 				'faVersion' => $faVersion,
 				'faCategories' => $this->manager->getFACategories($faVersion),
 				'faIcons' => $this->manager->getFAIcons($faVersion),
+				'faStyles' => $this->configuration['fa_styles'],
 				'recommendedIcons' => $this->configuration['recommended_enabled'] ? $this->configuration['recommended_icons'] : null
 			]
 		];
