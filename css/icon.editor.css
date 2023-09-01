@@ -7,24 +7,59 @@
 	max-width: 400px;
 }
 
-.ck .ck.ckeditor5-icons__picker .ck.ck-icon.ckeditor5-icons__icon {
-	text-align: center;
+
+/* Fixes CKEditor's CSS overriding Font Awesome styles in the icon picker */
+
+.ck .ck.ckeditor5-icons__picker .ck.ckeditor5-icons__icon.fa-solid:before,
+.ck .ck.ckeditor5-icons__picker .ck.ckeditor5-icons__icon.fa-regular:before,
+.ck .ck.ckeditor5-icons__picker .ck.ckeditor5-icons__icon.fa-light:before,
+.ck .ck.ckeditor5-icons__picker .ck.ckeditor5-icons__icon.fa-thin:before {
+	font-family: 'Font Awesome 6 Pro', 'Font Awesome 6 Free';
 }
 
-/* Needed to fix CKEditor overriding Font Awesome styles */
-.ck .ck.ckeditor5-icons__picker .ckeditor5-icons__icon.fa-solid,
-.ck .ck.ckeditor5-icons__picker .ckeditor5-icons__icon.fa-regular {
-	font-family: 'Font Awesome 6 Free';
+.ck .ck.ckeditor5-icons__picker .ck.ckeditor5-icons__icon.fa-duotone:before {
+	font-family: 'Font Awesome 6 Duotone';
 }
-.ck .ck.ckeditor5-icons__picker .ckeditor5-icons__icon.fas,
-.ck .ck.ckeditor5-icons__picker .ckeditor5-icons__icon.far {
-	font-family: 'Font Awesome 5 Free';
-}
-.ck .ck.ckeditor5-icons__picker .ckeditor5-icons__icon.fa-brands {
+
+.ck .ck.ckeditor5-icons__picker .ck.ckeditor5-icons__icon.fa-brands:before {
 	font-family: 'Font Awesome 6 Brands';
 }
-.ck .ck.ckeditor5-icons__picker .ckeditor5-icons__icon.fab {
+
+.ck .ck.ckeditor5-icons__picker .ck.ckeditor5-icons__icon.fas:before,
+.ck .ck.ckeditor5-icons__picker .ck.ckeditor5-icons__icon.far:before,
+.ck .ck.ckeditor5-icons__picker .ck.ckeditor5-icons__icon.fal:before {
+	font-family: 'Font Awesome 5 Pro', 'Font Awesome 5 Free';
+}
+
+.ck .ck.ckeditor5-icons__picker .ck.ckeditor5-icons__icon.fad:before {
+	font-family: 'Font Awesome 5 Duotone';
+}
+
+.ck .ck.ckeditor5-icons__picker .ck.ckeditor5-icons__icon.fab:before {
 	font-family: 'Font Awesome 5 Brands';
+}
+
+.ck .ck.ckeditor5-icons__picker .ck.ckeditor5-icons__icon.fa-solid:before,
+.ck .ck.ckeditor5-icons__picker .ck.ckeditor5-icons__icon.fas:before,
+.ck .ck.ckeditor5-icons__picker .ck.ckeditor5-icons__icon.fa-duotone:before,
+.ck .ck.ckeditor5-icons__picker .ck.ckeditor5-icons__icon.fad:before {
+	font-weight: 900;
+}
+
+.ck .ck.ckeditor5-icons__picker .ck.ckeditor5-icons__icon.fa-regular:before,
+.ck .ck.ckeditor5-icons__picker .ck.ckeditor5-icons__icon.far:before,
+.ck .ck.ckeditor5-icons__picker .ck.ckeditor5-icons__icon.fa-brands:before,
+.ck .ck.ckeditor5-icons__picker .ck.ckeditor5-icons__icon.fab:before {
+	font-weight: 400;
+}
+
+.ck .ck.ckeditor5-icons__picker .ck.ckeditor5-icons__icon.fa-light:before,
+.ck .ck.ckeditor5-icons__picker .ck.ckeditor5-icons__icon.fal:before {
+	font-weight: 300;
+}
+
+.ck .ck.ckeditor5-icons__picker .ck.ckeditor5-icons__icon.fa-thin:before {
+	font-weight: 100;
 }
 
 
@@ -115,8 +150,9 @@
 	padding-left: var(--ck-spacing-standard);
 }
 
-.ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-items .ck.ckeditor5-icons__grid-item .ck.ckeditor5-icons__icon::after {
+.ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-items .ck.ckeditor5-icons__grid-item .ck.ckeditor5-icons__icon:before {
 	font-size: var(--ck-icon-size);
+	line-height: 1em;
 }
 
 .ck .ck.ckeditor5-icons__grid .ck.ckeditor5-icons__grid-options-top {
@@ -193,7 +229,7 @@
 	flex-wrap: wrap;
 }
 
-.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ckeditor5-icons__icon-info {
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon-info {
 	display: inline-flex;
 	flex-direction: column;
 }
@@ -215,10 +251,12 @@
 	display: inline-block;
 	width: var(--ck-font-size-large);
 	height: var(--ck-font-size-large);
+	text-align: center;
 }
 
-.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon::after {
+.ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-preview .ck.ckeditor5-icons__icon:before {
 	font-size: var(--ck-font-size-large);
+	line-height: 1em;
 }
 
 .ck .ck.ckeditor5-icons__picker-footer .ck.ckeditor5-icons__picker-form {
