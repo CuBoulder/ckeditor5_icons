@@ -6,6 +6,18 @@ ckeditor5.plugin.ckeditor5_icons_icon:
     fa_version:
       type: string
       label: 'Font Awesome library version'
+    fa_styles:
+      type: sequence
+      label: 'Enabled styles'
+      sequence:
+        type: string
+        label: 'Style names'
+    custom_metadata:
+      type: boolean
+      label: 'Use custom Font Awesome metadata'
+    async_metadata:
+      type: boolean
+      label: 'Load the Font Awesome metadata asynchronously'
     recommended_enabled:
       type: boolean
       label: 'Show recommended'
