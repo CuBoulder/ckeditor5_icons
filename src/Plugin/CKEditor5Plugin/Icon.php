@@ -26,16 +26,6 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 	use CKEditor5PluginConfigurableTrait;
 
 	/**
-	 * The exact version of Font Awesome 6 metadata being used.
-	 */
-	const fa6Version = '6.4.2';
-
-	/**
-	 * The exact version of Font Awesome 5 metadata being used.
-	 */
-	const fa5Version = '5.15.4';
-
-	/**
 	 * Defines the available Font Awesome styles.
 	 */
 	const faStyles = [
@@ -48,11 +38,11 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 	];
 
 	/**
-	 * The CKEditor5 icons manager.
+	 * The CKEditor5IconsManager.
 	 * 
 	 * @var \Drupal\ckeditor5_plugins\CKEditor5IconsManagerInterface
 	 */
-	protected $manager;
+	protected CKEditor5IconsManagerInterface $manager;
 
 	/**
 	 * Constructs an Icon object.
@@ -64,7 +54,7 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 	 * @param mixed $plugin_definition
 	 *   The plugin implementation definition.
 	 * @param \Drupal\ckeditor5_plugins\CKEditor5IconsManagerInterface $manager
-	 *   The extension path resolver.
+	 *   The CKEditor5IconsManager.
 	 */
 	public function __construct(array $configuration, $plugin_id, $plugin_definition, CKEditor5IconsManagerInterface $manager) {
 		parent::__construct($configuration, $plugin_id, $plugin_definition);
@@ -103,6 +93,8 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 	 * Form for choosing which alignment types are available.
 	 */
 	public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+		$libraryVersions = $this->manager->getPreciseLibraryVersions();
+
 		$form['fa_version'] = [
 			'#type' => 'select',
 			'#title' => $this->t('Font Awesome library version'),
@@ -116,7 +108,7 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 		$form['custom_metadata'] = [
 			'#type' => 'select',
 			'#title' => $this->t('Font Awesome metadata'),
-			'#description' => $this->t('The included metadata uses %fa_free version @fa_6_v or @fa_5_v. Custom metadata is provided by the <a target="_blank" href="@fa_module_link">Font Awesome Icons</a> module which must be installed (required to use %fa_pro).', ['%fa_free' => 'Font Awesome Free', '%fa_pro' => 'Font Awesome Pro', '@fa_6_v' => self::fa6Version, '@fa_5_v' => self::fa5Version, '@fa_module_link' => 'https://www.drupal.org/project/fontawesome']),
+			'#description' => $this->t('The included metadata uses %fa_free version @fa_6_v or @fa_5_v. Custom metadata is provided by the <a target="_blank" href="@fa_module_link">Font Awesome Icons</a> module which must be installed (required to use %fa_pro).', ['%fa_free' => 'Font Awesome Free', '%fa_pro' => 'Font Awesome Pro', '@fa_6_v' => $libraryVersions['fontawesome6'], '@fa_5_v' => $libraryVersions['fontawesome5'], '@fa_module_link' => 'https://www.drupal.org/project/fontawesome']),
 			'#default_value' => $this->configuration['custom_metadata'],
 			'#options' => [
 				'Font Awesome Free',
@@ -147,6 +139,7 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 			'#description' => $this->t('Comma-separated icon names to display in the Recommended category. For a complete list of icon names visit <a target="_blank" href="@fa_url">Font Awesome\'s website</a>.', ['@fa_url' => 'https://fontawesome.com/search?m=free']),
 			'#default_value' => implode(',', $this->configuration['recommended_icons'])
 		];
+
 		return $form;
 	}
 

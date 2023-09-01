@@ -11,19 +11,25 @@ import type { WebpackPluginInstance } from 'webpack';
  */
 const webpackPluginConfig: { [key: string]: WebpackPluginInstance[]; } = {
 	icon: [
-		new CopyPlugin({
+		new CopyPlugin({ // "to" paths are relative to the build folder – in this case `./js/build`.
 			patterns: [
 				{
 					from: path.resolve(__dirname, 'node_modules/fontawesome6/metadata/(categories|icons).yml'),
-					to: path.resolve(__dirname, 'libraries/fontawesome6/metadata/[name][ext]')
+					to: '../../libraries/fontawesome6/metadata/[name][ext]'
 				},
 				{
 					from: path.resolve(__dirname, 'node_modules/fontawesome5/metadata/(categories|icons).yml'),
-					to: path.resolve(__dirname, 'libraries/fontawesome5/metadata/[name][ext]')
+					to: '../../libraries/fontawesome5/metadata/[name][ext]'
+				},
+				{
+					from: path.resolve(__dirname, 'node_modules/fontawesome(6|5)/package.json'),
+					to: '../../libraries/versions.yml',
+					transformAll: (assets) =>
+						assets.reduce((accumulator, asset) => `${accumulator}${path.basename(path.dirname(asset.sourceFilename))}: '${JSON.parse(asset.data.toString())['version'] as string}'\n`, '')
 				},
 				{
 					from: path.resolve(__dirname, 'node_modules/fontawesome6/svgs/solid/icons.svg'),
-					to: path.resolve(__dirname, 'icons/icon.svg')
+					to: '../../icons/icon.svg'
 				}
 			]
 		})

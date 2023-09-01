@@ -43,15 +43,28 @@ class CKEditor5IconsManager implements CKEditor5IconsManagerInterface {
 	/**
 	 * @inheritdoc
 	 */
+	public function getPreciseLibraryVersions() {
+		$cacheId = 'ckeditor5_icons.library_versions';
+		$cached = $this->dataCache->get($cacheId);
+		if ($cached)
+			return $cached->data;
+		$data = Yaml::parseFile($this->extensionPathResolver->getPath('module', 'ckeditor5_icons') . '/libraries/versions.yml');
+		$this->dataCache->set($cacheId, $data);
+		return $data;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function getFACategories($faVersion) {
 		$faVersion = $this->toValidFAVersion($faVersion);
 		$cacheId = 'ckeditor5_icons.fontawesome' . $faVersion . '.categories';
-		$faCategoriesCached = $this->dataCache->get($cacheId);
-		if ($faCategoriesCached)
-			return $faCategoriesCached->data;
-		$faCategories = Yaml::parseFile($this->extensionPathResolver->getPath('module', 'ckeditor5_icons') . '/libraries/fontawesome' . $faVersion . '/metadata/categories.yml');
-		$this->dataCache->set($cacheId, $faCategories);
-		return $faCategories;
+		$cached = $this->dataCache->get($cacheId);
+		if ($cached)
+			return $cached->data;
+		$data = Yaml::parseFile($this->extensionPathResolver->getPath('module', 'ckeditor5_icons') . '/libraries/fontawesome' . $faVersion . '/metadata/categories.yml');
+		$this->dataCache->set($cacheId, $data);
+		return $data;
 	}
 
 	/**
@@ -60,18 +73,18 @@ class CKEditor5IconsManager implements CKEditor5IconsManagerInterface {
 	public function getFAIcons($faVersion) {
 		$faVersion = $this->toValidFAVersion($faVersion);
 		$cacheId = 'ckeditor5_icons.fontawesome' . $faVersion . '.icons';
-		$faIconsCached = $this->dataCache->get($cacheId);
-		if ($faIconsCached)
-			return $faIconsCached->data;
-		$faIcons = array_map(function($icon) {
+		$cached = $this->dataCache->get($cacheId);
+		if ($cached)
+			return $cached->data;
+		$data = array_map(function($icon) {
 			return [
 				'styles' => $icon['styles'],
 				'label' => $icon['label'],
 				'search' => $icon['search']
 			];
 		}, Yaml::parseFile($this->extensionPathResolver->getPath('module', 'ckeditor5_icons') . '/libraries/fontawesome' . $faVersion . '/metadata/icons.yml'));
-		$this->dataCache->set($cacheId, $faIcons);
-		return $faIcons;
+		$this->dataCache->set($cacheId, $data);
+		return $data;
 	}
 
 	/**

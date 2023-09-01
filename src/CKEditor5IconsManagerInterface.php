@@ -8,11 +8,16 @@
 namespace Drupal\ckeditor5_icons;
 
 interface CKEditor5IconsManagerInterface {
+	/**
+	 * @return array
+	 *   The precise version designations of the Font Awesome libraries.
+	 */
+	public function getPreciseLibraryVersions();
 
 	/**
 	 * @param mixed $faVersion
 	 *   A likely valid Font Awesome version (optional).
-	 * @return
+	 * @return array
 	 *   The Font Awesome category metadata for a given Font Awesome version (defaults to 6).
 	 */
 	public function getFACategories($faVersion);
@@ -20,7 +25,7 @@ interface CKEditor5IconsManagerInterface {
 	/**
 	 * @param mixed $faVersion
 	 *   A likely valid Font Awesome version (optional).
-	 * @return
+	 * @return array
 	 *   The Font Awesome icon metadata for a given Font Awesome version (defaults to 6).
 	 */
 	public function getFAIcons($faVersion);
