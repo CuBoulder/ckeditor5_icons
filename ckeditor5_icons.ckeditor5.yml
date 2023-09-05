@@ -5,6 +5,14 @@ ckeditor5_icons_icon:
   ckeditor5:
     plugins:
       - icon.Icon
+    config:
+      icon:
+        faVersion: '6'
+        faStyles:
+          - solid
+          - regular
+          - brands
+        recommendedIcons: null
   # Configuration that will be used directly by Drupal.
   drupal:
     label: Icons

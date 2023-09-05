@@ -1,0 +1,17 @@
+# === Asynchronous metadata endpoints ===
+
+ckeditor5_icons.fontawesome6_metadata:
+  path: '/ckeditor5_icons/libraries/fontawesome6/metadata'
+  defaults:
+    _controller: Drupal\ckeditor5_icons\Controller\MetadataController::getFontAwesome6MetadataResponse
+    _format: json
+  requirements:
+    _access: 'TRUE'
+
+ckeditor5_icons.fontawesome5_metadata:
+  path: '/ckeditor5_icons/libraries/fontawesome5/metadata'
+  defaults:
+    _controller: Drupal\ckeditor5_icons\Controller\MetadataController::getFontAwesome5MetadataResponse
+    _format: json
+  requirements:
+    _access: 'TRUE'

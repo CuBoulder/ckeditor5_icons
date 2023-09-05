@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\ckeditor5_icons\CKEditor5IconsManager.
+ * Contains \Drupal\ckeditor5_icons\CKEditor5Icons.
  */
 
 namespace Drupal\ckeditor5_icons;
@@ -11,7 +11,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ExtensionPathResolver;
 use Symfony\Component\Yaml\Yaml;
 
-class CKEditor5IconsManager implements CKEditor5IconsManagerInterface {
+class CKEditor5Icons implements CKEditor5IconsInterface {
 
 	/**
 	 * The data cache.
@@ -28,7 +28,7 @@ class CKEditor5IconsManager implements CKEditor5IconsManagerInterface {
 	protected $extensionPathResolver;
 
 	/**
-	 * Constructs a CKEditor5IconsManager object.
+	 * Constructs a CKEditor5Icons object.
 	 *
 	 * @param \Drupal\Core\Cache\CacheBackendInterface $data_cache
 	 *   The data cache.
@@ -76,15 +76,29 @@ class CKEditor5IconsManager implements CKEditor5IconsManagerInterface {
 		$cached = $this->dataCache->get($cacheId);
 		if ($cached)
 			return $cached->data;
-		$data = array_map(function($icon) {
+		$data = array_map(function ($icon) {
 			return [
 				'styles' => $icon['styles'],
 				'label' => $icon['label'],
-				'search' => $icon['search']
+				'search' => ['terms' => array_map(function ($value) { return trim($value); }, $icon['search']['terms'])]
 			];
 		}, Yaml::parseFile($this->extensionPathResolver->getPath('module', 'ckeditor5_icons') . '/libraries/fontawesome' . $faVersion . '/metadata/icons.yml'));
 		$this->dataCache->set($cacheId, $data);
 		return $data;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getFAStyles() {
+		return [
+			'solid' => ['label' => 'Solid', 'pro' => false],
+			'regular' => ['label' => 'Regular', 'pro' => false],
+			'light' => ['label' => 'Light', 'pro' => true],
+			'thin' => ['label' => 'Thin', 'pro' => true],
+			'duotone' => ['label' => 'Duotone', 'pro' => true],
+			'brands' => ['label' => 'Brands', 'pro' => false]
+		];
 	}
 
 	/**
