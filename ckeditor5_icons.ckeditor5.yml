@@ -13,6 +13,7 @@ ckeditor5_icons_icon:
           - regular
           - brands
         recommendedIcons: null
+        asyncMetadataURI: '/ckeditor5_icons/libraries/fontawesome%v/metadata'
   # Configuration that will be used directly by Drupal.
   drupal:
     label: Icons

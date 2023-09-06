@@ -110,13 +110,15 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 	 * {@inheritdoc}
 	 */
 	public function getDynamicPluginConfig(array $static_plugin_config, EditorInterface $editor): array {
-		$dynamicConfig = [];
-		if (isset($this->configuration['fa_version'])) {
-			$faVersion = $this->configuration['fa_version'];
-			$dynamicConfig['faVersion'] = $faVersion;
-		} else $faVersion = $static_plugin_config['faVersion'];
-		$dynamicConfig['faCategories'] = $this->service->getFACategories($faVersion);
-		$dynamicConfig['faIcons'] = $this->service->getFAIcons($faVersion);
+		$staticConfig = $static_plugin_config['icon'];
+		$dynamicConfig = $staticConfig;
+		if (isset($this->configuration['fa_version']))
+			$dynamicConfig['faVersion'] = $this->configuration['fa_version'];
+		$faVersion = $dynamicConfig['faVersion'];
+		if (!$this->configuration['async_metadata']) {
+			$dynamicConfig['faCategories'] = $this->service->getFACategories($faVersion);
+			$dynamicConfig['faIcons'] = $this->service->getFAIcons($faVersion);	
+		}
 		if (isset($this->configuration['fa_styles']))
 			$dynamicConfig['faStyles'] = $this->configuration['fa_styles'];
 		if ($this->configuration['recommended_enabled'] && isset($this->configuration['recommended_icons']))

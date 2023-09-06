@@ -58,7 +58,6 @@ class MetadataController extends ControllerBase implements ContainerInjectionInt
 		$response = new Response();
 		$this->addHeaders($response);
 		$response->setContent(Json::encode([
-			'version' => $this->service->getPreciseLibraryVersions()['fontawesome6'],
 			'categories' => $this->service->getFACategories('6'),
 			'icons' => $this->service->getFAIcons('6')
 		]));
@@ -75,7 +74,6 @@ class MetadataController extends ControllerBase implements ContainerInjectionInt
 		$response = new Response();
 		$this->addHeaders($response);
 		$response->setContent(Json::encode([
-			'version' => $this->service->getPreciseLibraryVersions()['fontawesome5'],
 			'categories' => $this->service->getFACategories('5'),
 			'icons' => $this->service->getFAIcons('5')
 		]));
