@@ -40,7 +40,7 @@ export default class IconPickerItem extends ButtonView {
 		this.faIcon = new IconPickerFAIcon(locale, faVersion, iconName, iconDefinition, iconStyle);
 		this.faIcon.extendTemplate({
 			attributes: {
-				class: ['ck-icon', 'ck-button__icon', 'ck-icon_inherit-color']
+				class: ['ck', 'ck-icon', 'ck-button__icon', 'ck-icon_inherit-color']
 			}
 		});
 
@@ -62,6 +62,7 @@ export default class IconPickerItem extends ButtonView {
 	 */
 	public override render() {
 		super.render();
-		this.element!.appendChild(this.faIcon.element!);
+		const element = this.element!;
+		element.insertBefore(this.faIcon.element!, element.firstChild);
 	}
 }

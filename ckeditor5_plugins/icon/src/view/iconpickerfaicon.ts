@@ -26,15 +26,23 @@ export default class IconPickerFAIcon extends View {
 		super(locale);
 
 		this.setTemplate({
-			tag: 'i',
+			tag: 'span',
 			attributes: {
-				class: [
-					'ck',
-					'ckeditor5-icons__icon',
-					getFAStyleClass(faVersion, getValidIconStyle(iconDefinition, iconStyle)),
-					'fa-' + iconName
-				]
-			}
+				class: ['ck-reset_all-excluded']
+			},
+			children: [
+				{
+					tag: 'i',
+					attributes: {
+						class: [
+							'ck',
+							'ckeditor5-icons__icon',
+							getFAStyleClass(faVersion, getValidIconStyle(iconDefinition, iconStyle)),
+							'fa-' + iconName
+						]
+					}
+				}
+			]
 		});
 	}
 }

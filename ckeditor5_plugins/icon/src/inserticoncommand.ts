@@ -3,6 +3,8 @@
  */
 
 import { Command } from 'ckeditor5/src/core';
+import type { DocumentSelection, Element, Model } from 'ckeditor5/src/engine';
+import { findOptimalInsertionRange } from 'ckeditor5/src/widget';
 
 /**
  * Represents a command which is executed when the icon toolbar button is pressed.
@@ -29,18 +31,26 @@ export default class InsertIconCommand extends Command {
 	 */
 	public override refresh() {
 		const { model } = this.editor;
-		const { selection } = model.document;
+		const { document, schema } = model;
 
 		// Determine if the cursor (selection) is in a position where adding a
 		// icon is permitted. This is based on the schema of the model(s)
 		// currently containing the cursor.
-		const allowedIn = model.schema.findAllowedParent(
-			selection.getFirstPosition()!,
-			'icon'
-		);
+		const allowedIn = schema.checkChild(getParentElement(document.selection, model), 'icon');
 
 		// If the cursor is not in a location where a icon can be added, return
 		// null so the addition doesn't happen.
 		this.isEnabled = allowedIn !== null;
 	}
+}
+
+/**
+ * @returns
+ *   The parent element to evalute whether an icon can be inserted as a child.
+ */
+function getParentElement(selection: DocumentSelection, model: Model): Element {
+	const parent = findOptimalInsertionRange(selection, model).start.parent;
+	if (parent.isEmpty && !parent.is('element', '$root'))
+		return parent.parent as Element;
+	return parent as Element;
 }

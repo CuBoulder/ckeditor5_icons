@@ -1,6 +1,10 @@
-import type { TemplateDefinition } from "ckeditor5/src/ui";
-import { View } from "ckeditor5/src/ui";
-import { Locale } from "ckeditor5/src/utils";
+/**
+ * @file defines a helper view that can be conveniently created and hidden when necessary.
+ */
+
+import type { TemplateDefinition } from 'ckeditor5/src/ui';
+import { View } from 'ckeditor5/src/ui';
+import type { Locale } from 'ckeditor5/src/utils';
 
 export default class HideableView extends View {
 	/**
