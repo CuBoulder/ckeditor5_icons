@@ -65,7 +65,7 @@ export default class IconPicker extends Plugin implements PluginInterface {
 							loadingView.extendTemplate({ attributes: { class: ['ck', 'ckeditor5-icons__picker-loading'], tabindex: '-1' } });
 							dropdownView.panelView.children.add(loadingView);
 						}
-						const metadata = await this._loadAsyncMetadata(config.get('icon.asyncMetadataURI')!, faVersion, customMetadata);
+						const metadata = await this._loadAsyncMetadata(config.get('icon.asyncMetadataURI')!);
 						if (!iconPickerView) { // A previous request may have already resolved and been handled.
 							iconPickerView = this._createIconPickerView(locale, command, faVersion, metadata.categories, metadata.icons, styles, customMetadata, recommendedIcons);
 							dropdownView.panelView.children.add(iconPickerView);
@@ -118,8 +118,8 @@ export default class IconPicker extends Plugin implements PluginInterface {
 	 * @returns
 	 *   The loaded metadata.
 	 */
-	private async _loadAsyncMetadata(asyncMetadataURI: string, faVersion: FontAwesomeVersion, customMetadata?: boolean): Promise<{ categories: CategoryDefinitions, icons: IconDefinitions }> {
-		const response = await fetch(asyncMetadataURI.replace('%v', customMetadata ? '' : faVersion));
+	private async _loadAsyncMetadata(asyncMetadataURI: string): Promise<{ categories: CategoryDefinitions, icons: IconDefinitions }> {
+		const response = await fetch(asyncMetadataURI);
 		return await response.json();
 	}
 }

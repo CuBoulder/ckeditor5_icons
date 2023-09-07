@@ -22,7 +22,7 @@ class MetadataController extends ControllerBase implements ContainerInjectionInt
 	/**
 	 * The module's service
 	 * 
-	 * @var \Drupal\ckeditor5_plugins\CKEditor5IconsInterface
+	 * @var \Drupal\ckeditor5_icons\CKEditor5IconsInterface
 	 */
 	protected $service;
 
@@ -38,7 +38,7 @@ class MetadataController extends ControllerBase implements ContainerInjectionInt
 	 * 
 	 * @param \Symfony\Component\HttpFoundation\Request $request
 	 *   The current HTTP request.
-	 * @param \Drupal\ckeditor5_plugins\CKEditor5IconsInterface $service
+	 * @param \Drupal\ckeditor5_icons\CKEditor5IconsInterface $service
 	 *   The module's service.
 	 * @param \Drupal\fontawesome\FontAwesomeManager|null $manager
 	 *   The Font Awesome manager from the contrib module (optional).

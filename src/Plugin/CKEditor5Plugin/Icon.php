@@ -12,9 +12,11 @@ use Drupal\ckeditor5\Plugin\CKEditor5PluginConfigurableInterface;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginConfigurableTrait;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginDefault;
 use Drupal\ckeditor5_icons\CKEditor5IconsInterface;
+use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginFormFactoryInterface;
 use Drupal\Core\Plugin\PluginWithFormsInterface;
+use Drupal\Core\Url;
 use Drupal\editor\EditorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -42,6 +44,13 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 	protected $service;
 
 	/**
+	 * The token generator for generating CSRF tokens.
+	 * 
+	 * @var \Drupal\Core\Access\CsrfTokenGenerator
+	 */
+	protected $tokenGenerator;
+
+	/**
 	 * The Font Awesome manager from the contrib module (optional).
 	 * 
 	 * @var \Drupal\fontawesome\FontAwesomeManager|null
@@ -59,14 +68,17 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 	 *   The plugin implementation definition.
 	 * @param \Drupal\Core\Plugin\PluginFormFactoryInterface $pluginFormFactory
 	 *   The plugin form factory.
+	 * @param\Drupal\Core\Access\CsrfTokenGenerator $tokenGenerator
+	 *   The token generator for generating CSRF tokens.
 	 * @param \Drupal\ckeditor5_icons\CKEditor5IconsInterface $service
 	 *   The module's service.
 	 * @param \Drupal\fontawesome\FontAwesomeManager|null $manager
 	 *   The Font Awesome manager from the contrib module (optional).
 	 */
-	public function __construct(array $configuration, $plugin_id, $plugin_definition, PluginFormFactoryInterface $pluginFormFactory, CKEditor5IconsInterface $service, $fontAwesomeManager) {
+	public function __construct(array $configuration, $plugin_id, $plugin_definition, PluginFormFactoryInterface $pluginFormFactory, CsrfTokenGenerator $tokenGenerator, CKEditor5IconsInterface $service, $fontAwesomeManager) {
 		parent::__construct($configuration, $plugin_id, $plugin_definition);
 		$this->form = $pluginFormFactory->createInstance($this, 'configure');
+		$this->tokenGenerator = $tokenGenerator;
 		$this->service = $service;
 		$this->fontAwesomeManager = $fontAwesomeManager;
 	}
@@ -80,6 +92,7 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 			$plugin_id,
 			$plugin_definition,
 			$container->get('plugin_form.factory'),
+			$container->get('csrf_token'),
 			$container->get('ckeditor5_icons.CKEditor5Icons'),
 			$container->get('module_handler')->moduleExists('fontawesome') ? $container->get('fontawesome.font_awesome_manager') : null
 		);
@@ -91,7 +104,7 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 	public function defaultConfiguration() {
 		return [
 			'custom_metadata' => false,
-			'async_metadata' => true,
+			'async_metadata' => TRUE,
 			'recommended_enabled' => false
 		];
 	}
@@ -123,12 +136,24 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 	public function getDynamicPluginConfig(array $static_plugin_config, EditorInterface $editor): array {
 		$staticConfig = $static_plugin_config['icon'];
 		$dynamicConfig = $staticConfig;
+
 		if (isset($this->configuration['fa_version']))
 			$dynamicConfig['faVersion'] = $this->configuration['fa_version'];
 		$faVersion = $dynamicConfig['faVersion'];
+
 		$customMetadata = $this->configuration['custom_metadata'] && $this->fontAwesomeManager !== null;
 		$dynamicConfig['customMetadata'] = $customMetadata;
-		if (!$this->configuration['async_metadata']) {
+
+		if ($this->configuration['async_metadata']) { // Provides the CSRF-protected ajax URI for asynchronous metadata loading.
+			$url = Url::fromRoute('ckeditor5_icons.fontawesome' . ($customMetadata ? '' : $faVersion) . '_metadata');
+			// Strips the leading `/` and query string from the URI to give it to the CSRF token generator.
+			$tokenURI = substr($url->toString(), 1);
+			$tokenURI = substr($tokenURI, 0, strpos($tokenURI, '?'));
+			// Generates and adds the CSRF token as a query parameter.
+			$url->setOptions(['query' => ['token' => $this->tokenGenerator->get($tokenURI)]]);
+			// Sets `asyncMetadataURI` to the full URI with CSRF token.
+			$dynamicConfig['asyncMetadataURI'] = $url->toString();
+		} else { // Provides the synchronous metadata.
 			if ($customMetadata) {
 				$dynamicConfig['faCategories'] = $this->fontAwesomeManager->getCategories();
 				$dynamicConfig['faIcons'] = $this->fontAwesomeManager->getMetadata();
@@ -137,10 +162,12 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 				$dynamicConfig['faIcons'] = $this->service->getFAIcons($faVersion);
 			}
 		}
+
 		if (isset($this->configuration['fa_styles']))
 			$dynamicConfig['faStyles'] = $this->configuration['fa_styles'];
 		if ($this->configuration['recommended_enabled'] && isset($this->configuration['recommended_icons']))
 			$dynamicConfig['recommendedIcons'] = $this->configuration['recommended_icons'];
+
 		return ['icon' => $dynamicConfig];
 	}
 
@@ -148,7 +175,7 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 	 * @inheritdoc
 	 */
 	public function hasFormClass($operation) {
-		return true;
+		return TRUE;
 	}
 
 	/**

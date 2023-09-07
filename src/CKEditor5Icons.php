@@ -12,7 +12,6 @@ use Drupal\Core\Extension\ExtensionPathResolver;
 use Symfony\Component\Yaml\Yaml;
 
 class CKEditor5Icons implements CKEditor5IconsInterface {
-
 	/**
 	 * The data cache.
 	 *
@@ -92,12 +91,12 @@ class CKEditor5Icons implements CKEditor5IconsInterface {
 	 */
 	public function getFAStyles() {
 		return [
-			'solid' => ['label' => 'Solid', 'pro' => false],
-			'regular' => ['label' => 'Regular', 'pro' => false],
-			'light' => ['label' => 'Light', 'pro' => true],
-			'thin' => ['label' => 'Thin', 'pro' => true],
-			'duotone' => ['label' => 'Duotone', 'pro' => true],
-			'brands' => ['label' => 'Brands', 'pro' => false]
+			'solid' => ['label' => 'Solid', 'pro' => FALSE],
+			'regular' => ['label' => 'Regular', 'pro' => FALSE],
+			'light' => ['label' => 'Light', 'pro' => TRUE],
+			'thin' => ['label' => 'Thin', 'pro' => TRUE],
+			'duotone' => ['label' => 'Duotone', 'pro' => TRUE],
+			'brands' => ['label' => 'Brands', 'pro' => FALSE]
 		];
 	}
 

@@ -27,7 +27,7 @@ class ConfigureIconForm extends PluginFormBase implements ContainerInjectionInte
 	/**
 	 * @inheritdoc
 	 * 
-	 * @var \Drupal\ckeditor5_plugins\Plugin\CKEditor5Plugin\Icon
+	 * @var \Drupal\ckeditor5_icons\Plugin\CKEditor5Plugin\Icon
 	 */
 	protected $plugin;
 
@@ -41,7 +41,7 @@ class ConfigureIconForm extends PluginFormBase implements ContainerInjectionInte
 	/**
 	 * The module's service.
 	 * 
-	 * @var \Drupal\ckeditor5_plugins\CKEditor5IconsInterface
+	 * @var \Drupal\ckeditor5_icons\CKEditor5IconsInterface
 	 */
 	protected $service;
 
@@ -50,7 +50,7 @@ class ConfigureIconForm extends PluginFormBase implements ContainerInjectionInte
 	 * 
 	 * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
 	 *   The module handler.
-	 * @param \Drupal\ckeditor5_plugins\CKEditor5IconsInterface $service
+	 * @param \Drupal\ckeditor5_icons\CKEditor5IconsInterface $service
 	 *   The module's service.
 	 */
 	public function __construct(ModuleHandlerInterface $moduleHandler, CKEditor5IconsInterface $service) {
@@ -106,8 +106,7 @@ class ConfigureIconForm extends PluginFormBase implements ContainerInjectionInte
 		];
 		$form['fa_styles'] = [
 			'#type' => 'fieldset',
-			'#title' => $this->t('Font Awesome styles'),
-			'#open' => true
+			'#title' => $this->t('Font Awesome styles')
 		];
 		array_walk($faStyles, function($style, $styleName) use ($configuration, $editorConfig, &$form) {
 			$formElementId = 'fa_styles_' . $styleName;
@@ -139,10 +138,9 @@ class ConfigureIconForm extends PluginFormBase implements ContainerInjectionInte
 	 */
 	public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
 		$faStyles = $this->service->getFAStyles();
-		$customMetadata = (bool) $form_state->getValue('custom_metadata');
 		$selectedStyles = [];
 
-		array_walk($faStyles, function($style, $styleName) use ($form_state, &$form, &$selectedStyles, $customMetadata) {
+		array_walk($faStyles, function($style, $styleName) use ($form_state, &$selectedStyles) {
 			$formElementId = 'fa_styles_' . $styleName;
 			if ($form_state->getValue('fa_styles')[$formElementId])
 				$selectedStyles[] = $styleName;
@@ -150,7 +148,7 @@ class ConfigureIconForm extends PluginFormBase implements ContainerInjectionInte
 
 		$form_state->setValue('fa_version', $this->service->toValidFAVersion($form_state->getValue('fa_version')));
 		$form_state->setValue('fa_styles', $selectedStyles);
-		$form_state->setValue('custom_metadata', $customMetadata);
+		$form_state->setValue('custom_metadata', (bool) $form_state->getValue('custom_metadata'));
 		$form_state->setValue('async_metatdata', (bool) $form_state->getValue('async_metatdata'));
 		$form_state->setValue('recommended_enabled', (bool) $form_state->getValue('recommended_enabled'));
 		$form_state->setValue('recommended_icons', array_filter(array_map(function ($value) { return preg_replace('/([^a-z0-9\-]+)/', '', strtolower($value)); }, explode(',', $form_state->getValue('recommended_icons')))));
