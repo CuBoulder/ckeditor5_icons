@@ -18,7 +18,7 @@ import DrupalAjaxProgressThrobberView from './view/drupalajaxprogressthrobbervie
 export default class IconPicker extends Plugin implements PluginInterface {
 	/**
 	 * @inheritdoc
-	  */
+	 */
 	public init() {
 		const { commands, config, ui } = this.editor,
 			command = commands.get('insertIcon')!,
@@ -28,7 +28,9 @@ export default class IconPicker extends Plugin implements PluginInterface {
 		const faCategories: CategoryDefinitions | undefined = config.get('icon.faCategories');
 		const faIcons: IconDefinitions | undefined = config.get('icon.faIcons');
 		const faStyles: FontAwesomeStyle[] | undefined = config.get('icon.faStyles');
+		const customMetadata: boolean | undefined = config.get('icon.customMetadata');
 		const recommendedIcons: IconName[] | null | undefined = config.get('icon.recommendedIcons');
+	
 		let styles: FontAwesomeStyle[] = (Object.keys(faStyleLabels) as FontAwesomeStyle[]);
 		if (faStyles)
 			styles = styles.filter(value => faStyles.includes(value));
@@ -52,7 +54,7 @@ export default class IconPicker extends Plugin implements PluginInterface {
 			dropdownView.on('change:isOpen', async () => {
 				if (!iconPickerView) {
 					if (faCategories && faIcons) { // Metadata was provided synchronously.
-						iconPickerView = this._createIconPickerView(locale, command, faVersion, faCategories, faIcons, styles, recommendedIcons);
+						iconPickerView = this._createIconPickerView(locale, command, faVersion, faCategories, faIcons, styles, customMetadata, recommendedIcons);
 						dropdownView.panelView.children.add(iconPickerView);
 					} else { // Metadata was not provided synchronously. Makes ajax request to the provided URI instead.
 						const now = Date.now();
@@ -63,9 +65,9 @@ export default class IconPicker extends Plugin implements PluginInterface {
 							loadingView.extendTemplate({ attributes: { class: ['ck', 'ckeditor5-icons__picker-loading'], tabindex: '-1' } });
 							dropdownView.panelView.children.add(loadingView);
 						}
-						const metadata = await this._loadAsyncMetadata(config.get('icon.asyncMetadataURI')!, faVersion);
+						const metadata = await this._loadAsyncMetadata(config.get('icon.asyncMetadataURI')!, faVersion, customMetadata);
 						if (!iconPickerView) { // A previous request may have already resolved and been handled.
-							iconPickerView = this._createIconPickerView(locale, command, faVersion, metadata.categories, metadata.icons, styles, recommendedIcons);
+							iconPickerView = this._createIconPickerView(locale, command, faVersion, metadata.categories, metadata.icons, styles, customMetadata, recommendedIcons);
 							dropdownView.panelView.children.add(iconPickerView);
 							if (dropdownView.isOpen)
 								iconPickerView.focus();
@@ -88,7 +90,21 @@ export default class IconPicker extends Plugin implements PluginInterface {
 	 * @returns
 	 *   The instance of `IconPickerView`.
 	 */
-	private _createIconPickerView(locale: Locale, command: Command,  faVersion: FontAwesomeVersion, faCategories: CategoryDefinitions, faIcons: IconDefinitions, styles: FontAwesomeStyle[], recommendedIcons: IconName[] | null | undefined): IconPickerView {
+	private _createIconPickerView(locale: Locale, command: Command,  faVersion: FontAwesomeVersion, faCategories: CategoryDefinitions, faIcons: IconDefinitions, styles: FontAwesomeStyle[], customMetadata?: boolean, recommendedIcons?: IconName[] | null): IconPickerView {
+		for (const [iconName, iconDefinition] of Object.entries(faIcons)) {
+			iconDefinition.styles = iconDefinition.styles.filter(value => styles.includes(value)); // Drops any non-allowed styles from icons.
+			if (!iconDefinition.styles.length) { // Drops icons with no styles.
+				delete faIcons[iconName];
+				continue;
+			}
+			if (customMetadata) // Trims the search terms if custom metadata is being used. For the default metadata this is taken care of already.
+				iconDefinition.search.terms = iconDefinition.search.terms.map(term => term.trim());
+		}
+		for (const [categoryName, categoryDefinition] of Object.entries(faCategories)) {
+			categoryDefinition.icons = categoryDefinition.icons.filter(value => !!faIcons[value]); // Drops icons that don't exist from the categories.
+			if (!categoryDefinition.icons.length) // Drops categories with no icons.
+				delete faCategories[categoryName];
+		}
 		const iconPickerView = new IconPickerView(locale, faVersion, faCategories, faIcons, styles, recommendedIcons);
 		this.listenTo<InsertIconEvent>(iconPickerView, 'execute', (_eventInfo, iconName, iconStyle) => { // Inserts the icon when the icon picker view fires the `execute` event.
 			command.execute({ iconClass: getFAStyleClass(faVersion, iconStyle) + ' fa-' + iconName });
@@ -102,8 +118,8 @@ export default class IconPicker extends Plugin implements PluginInterface {
 	 * @returns
 	 *   The loaded metadata.
 	 */
-	private async _loadAsyncMetadata(asyncMetadataURI: string, faVersion: FontAwesomeVersion): Promise<{ categories: CategoryDefinitions, icons: IconDefinitions }> {
-		const response = await fetch(asyncMetadataURI.replace('%v', faVersion));
-		return await response.json()
+	private async _loadAsyncMetadata(asyncMetadataURI: string, faVersion: FontAwesomeVersion, customMetadata?: boolean): Promise<{ categories: CategoryDefinitions, icons: IconDefinitions }> {
+		const response = await fetch(asyncMetadataURI.replace('%v', customMetadata ? '' : faVersion));
+		return await response.json();
 	}
 }

@@ -8,7 +8,9 @@
 namespace Drupal\ckeditor5_icons\PluginForm;
 
 use Drupal\ckeditor5_icons\CKEditor5IconsInterface;
+use Drupal\Component\Serialization\Json;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormBase;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -30,6 +32,13 @@ class ConfigureIconForm extends PluginFormBase implements ContainerInjectionInte
 	protected $plugin;
 
 	/**
+	 * The module handler.
+	 * 
+	 * @var \Drupal\Core\Extension\ModuleHandlerInterface
+	 */
+	protected $moduleHandler;
+
+	/**
 	 * The module's service.
 	 * 
 	 * @var \Drupal\ckeditor5_plugins\CKEditor5IconsInterface
@@ -39,10 +48,13 @@ class ConfigureIconForm extends PluginFormBase implements ContainerInjectionInte
 	/**
 	 * Constructs a ConfigureIconForm object.
 	 * 
+	 * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+	 *   The module handler.
 	 * @param \Drupal\ckeditor5_plugins\CKEditor5IconsInterface $service
 	 *   The module's service.
 	 */
-	public function __construct(CKEditor5IconsInterface $service) {
+	public function __construct(ModuleHandlerInterface $moduleHandler, CKEditor5IconsInterface $service) {
+		$this->moduleHandler = $moduleHandler;
 		$this->service = $service;
 	}
 
@@ -51,6 +63,7 @@ class ConfigureIconForm extends PluginFormBase implements ContainerInjectionInte
 	 */
 	public static function create(ContainerInterface $container) {
 		return new static(
+			$container->get('module_handler'),
 			$container->get('ckeditor5_icons.CKEditor5Icons')
 		);
 	}
@@ -63,6 +76,7 @@ class ConfigureIconForm extends PluginFormBase implements ContainerInjectionInte
 		$faStyles = $this->service->getFAStyles();
 		$configuration = $this->plugin->getConfiguration();
 		$editorConfig = $this->plugin->getPluginDefinition()->getCKEditor5Config()['icon'];
+		$faModuleExists = $this->moduleHandler->moduleExists('fontawesome');
 
 		$form['fa_version'] = [
 			'#type' => 'select',
@@ -77,8 +91,8 @@ class ConfigureIconForm extends PluginFormBase implements ContainerInjectionInte
 		$form['custom_metadata'] = [
 			'#type' => 'select',
 			'#title' => $this->t('Font Awesome metadata'),
-			'#description' => $this->t('The Font Awesome Free metadata uses version @fa_6_v or @fa_5_v. Custom metadata is provided by the <a target="_blank" href="@fa_module_link">Font Awesome Icons</a> module which must be installed (required to use Font Awesome Pro).', ['@fa_6_v' => $libraryVersions['fontawesome6'], '@fa_5_v' => $libraryVersions['fontawesome5'], '@fa_module_link' => 'https://www.drupal.org/project/fontawesome']),
-			'#default_value' => $configuration['custom_metadata'],
+			'#description' => $this->t('The Font Awesome Free metadata uses version @fa_6_v or @fa_5_v. To supply Font Awesome Pro metadata or a custom version, select Custom.', ['@fa_6_v' => $libraryVersions['fontawesome6'], '@fa_5_v' => $libraryVersions['fontawesome5'], '@fa_module_link' => 'https://www.drupal.org/project/fontawesome']),
+			'#default_value' => $faModuleExists ? $configuration['custom_metadata'] : 0,
 			'#options' => [
 				$this->t('Font Awesome Free'),
 				$this->t('Custom')
@@ -87,16 +101,24 @@ class ConfigureIconForm extends PluginFormBase implements ContainerInjectionInte
 		$form['async_metadata'] = [
 			'#type' => 'checkbox',
 			'#title' => $this->t('Load metadata asynchronously'),
-			'#description' => $this->t('Loads the Font Awesome metadata only when the icon picker is opened to decrease page size and load time.'),
+			'#description' => $this->t('Loads the Font Awesome metadata only when the icon picker is opened to decrease page size and load time. It\'s recommended to leave this enabled except for troubleshooting problems.'),
 			'#default_value' => $configuration['async_metadata']
 		];
 		$form['fa_styles'] = [
-			'#type' => 'checkboxes',
-			'#title' => $this->t('Enabled styles'),
-			'#description' => $this->t('Icons and styles exclusive to Font Awesome Pro will not function properly when using the Font Awesome Free metadata and require the <a target="_blank" href="@fa_module_link">Font Awesome Icons</a> module. The "Thin" style requires Font Awesome 6.', ['@fa_module_link' => 'https://www.drupal.org/project/fontawesome']),
-			'#default_value' => isset($configuration['fa_styles']) ? $configuration['fa_styles'] : $editorConfig['faStyles'],
-			'#options' => array_map(function ($style) { return $this->t($style['label'] . ($style['pro'] ? ' (requires Font Awesome Pro)' : '')); }, $faStyles)
+			'#type' => 'fieldset',
+			'#title' => $this->t('Font Awesome styles'),
+			'#open' => true
 		];
+		array_walk($faStyles, function($style, $styleName) use ($configuration, $editorConfig, &$form) {
+			$formElementId = 'fa_styles_' . $styleName;
+			$form['fa_styles'][$formElementId] = [
+				'#type' => 'checkbox',
+				'#title' => $this->t($style['label']),
+				'#default_value' => in_array($styleName, isset($configuration['fa_styles']) ? $configuration['fa_styles'] : $editorConfig['faStyles'])
+			];
+			if ($style['pro'])
+				$form['fa_styles'][$formElementId]['#description'] = $this->t('Requires Font Awesome Pro.');
+		});
 		$form['recommended_enabled'] = [
 			'#type' => 'checkbox',
 			'#title' => $this->t('Show the Recommended category'),
@@ -117,12 +139,24 @@ class ConfigureIconForm extends PluginFormBase implements ContainerInjectionInte
 	 */
 	public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
 		$faStyles = $this->service->getFAStyles();
+		$customMetadata = (bool) $form_state->getValue('custom_metadata');
+		$selectedStyles = [];
+
+		array_walk($faStyles, function($style, $styleName) use ($form_state, &$form, &$selectedStyles, $customMetadata) {
+			$formElementId = 'fa_styles_' . $styleName;
+			if ($form_state->getValue('fa_styles')[$formElementId])
+				$selectedStyles[] = $styleName;
+		});
 
 		$form_state->setValue('fa_version', $this->service->toValidFAVersion($form_state->getValue('fa_version')));
-		$form_state->setValue('fa_styles', array_keys(array_filter($form_state->getValue('fa_styles'), function ($key) use ($faStyles) { return isset($faStyles[$key]); })));
+		$form_state->setValue('fa_styles', $selectedStyles);
+		$form_state->setValue('custom_metadata', $customMetadata);
 		$form_state->setValue('async_metatdata', (bool) $form_state->getValue('async_metatdata'));
 		$form_state->setValue('recommended_enabled', (bool) $form_state->getValue('recommended_enabled'));
 		$form_state->setValue('recommended_icons', array_filter(array_map(function ($value) { return preg_replace('/([^a-z0-9\-]+)/', '', strtolower($value)); }, explode(',', $form_state->getValue('recommended_icons')))));
+
+		if (!$this->moduleHandler->moduleExists('fontawesome') && $form_state->getValue('custom_metadata'))
+			$form_state->setError($form['custom_metadata'], $this->t('<a target="_blank" href="@fa_module_link">Font Awesome Icons</a> must be installed to use custom Font Awesome metadata.', ['@fa_module_link' => 'https://www.drupal.org/project/fontawesome']));
 	}
 
 	/**
@@ -133,6 +167,7 @@ class ConfigureIconForm extends PluginFormBase implements ContainerInjectionInte
 	
 		$configuration['fa_version'] = $form_state->getValue('fa_version');
 		$configuration['fa_styles'] = $form_state->getValue('fa_styles');
+		$configuration['custom_metadata'] = $form_state->getValue('custom_metadata');
 		$configuration['async_metadata'] = $form_state->getValue('async_metadata');
 		$configuration['recommended_enabled'] = $form_state->getValue('recommended_enabled');
 		$recommendedIcons = $form_state->getValue('recommended_icons');

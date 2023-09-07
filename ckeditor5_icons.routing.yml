@@ -15,3 +15,11 @@ ckeditor5_icons.fontawesome5_metadata:
     _format: json
   requirements:
     _access: 'TRUE'
+
+ckeditor5_icons.fontawesome_metadata:
+  path: '/ckeditor5_icons/libraries/fontawesome/metadata'
+  defaults:
+    _controller: Drupal\ckeditor5_icons\Controller\MetadataController::getFontAwesomeCustomMetadataResponse
+    _format: json
+  requirements:
+    _access: 'TRUE'

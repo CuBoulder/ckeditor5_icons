@@ -8,13 +8,8 @@
 }
 
 .ck .ck.ckeditor5-icons__picker-loading {
+	font-size: var(--ck-icon-size);
 	text-align: center;
-	padding: var(--ck-spacing-large);
-}
-
-.ck .ck.ckeditor5-icons__picker-loading div {
-	width: var(--ck-icon-size);
-	height: var(--ck-icon-size);
 }
 
 

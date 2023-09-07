@@ -14,6 +14,7 @@ export interface IconConfig {
 	faStyles?: FontAwesomeStyle[];
 	faIcons?: IconDefinitions;
 	recommendedIcons?: IconName[] | null;
+	customMetadata?: boolean;
 	asyncMetadataURI: string;
 };
 

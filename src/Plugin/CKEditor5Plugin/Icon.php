@@ -42,6 +42,13 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 	protected $service;
 
 	/**
+	 * The Font Awesome manager from the contrib module (optional).
+	 * 
+	 * @var \Drupal\fontawesome\FontAwesomeManager|null
+	 */
+	protected $fontAwesomeManager;
+
+	/**
 	 * Constructs an Icon object.
 	 *
 	 * @param array $configuration
@@ -54,11 +61,14 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 	 *   The plugin form factory.
 	 * @param \Drupal\ckeditor5_icons\CKEditor5IconsInterface $service
 	 *   The module's service.
+	 * @param \Drupal\fontawesome\FontAwesomeManager|null $manager
+	 *   The Font Awesome manager from the contrib module (optional).
 	 */
-	public function __construct(array $configuration, $plugin_id, $plugin_definition, PluginFormFactoryInterface $pluginFormFactory, CKEditor5IconsInterface $service) {
+	public function __construct(array $configuration, $plugin_id, $plugin_definition, PluginFormFactoryInterface $pluginFormFactory, CKEditor5IconsInterface $service, $fontAwesomeManager) {
 		parent::__construct($configuration, $plugin_id, $plugin_definition);
 		$this->form = $pluginFormFactory->createInstance($this, 'configure');
 		$this->service = $service;
+		$this->fontAwesomeManager = $fontAwesomeManager;
 	}
 
 	/**
@@ -70,7 +80,8 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 			$plugin_id,
 			$plugin_definition,
 			$container->get('plugin_form.factory'),
-			$container->get('ckeditor5_icons.CKEditor5Icons')
+			$container->get('ckeditor5_icons.CKEditor5Icons'),
+			$container->get('module_handler')->moduleExists('fontawesome') ? $container->get('fontawesome.font_awesome_manager') : null
 		);
 	}
 
@@ -115,9 +126,16 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 		if (isset($this->configuration['fa_version']))
 			$dynamicConfig['faVersion'] = $this->configuration['fa_version'];
 		$faVersion = $dynamicConfig['faVersion'];
+		$customMetadata = $this->configuration['custom_metadata'] && $this->fontAwesomeManager !== null;
+		$dynamicConfig['customMetadata'] = $customMetadata;
 		if (!$this->configuration['async_metadata']) {
-			$dynamicConfig['faCategories'] = $this->service->getFACategories($faVersion);
-			$dynamicConfig['faIcons'] = $this->service->getFAIcons($faVersion);	
+			if ($customMetadata) {
+				$dynamicConfig['faCategories'] = $this->fontAwesomeManager->getCategories();
+				$dynamicConfig['faIcons'] = $this->fontAwesomeManager->getMetadata();
+			} else {
+				$dynamicConfig['faCategories'] = $this->service->getFACategories($faVersion);
+				$dynamicConfig['faIcons'] = $this->service->getFAIcons($faVersion);
+			}
 		}
 		if (isset($this->configuration['fa_styles']))
 			$dynamicConfig['faStyles'] = $this->configuration['fa_styles'];
@@ -137,6 +155,6 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 	 * @inheritdoc
 	 */
 	public function getFormClass($operation) {
-		return 'Drupal\ckeditor5_icons\PluginForm\ConfigureIconForm';
+		return \Drupal\ckeditor5_icons\PluginForm\ConfigureIconForm::class;
 	}
 }
