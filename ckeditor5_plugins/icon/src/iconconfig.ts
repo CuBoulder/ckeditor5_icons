@@ -123,7 +123,7 @@ export const faStyleLabels: { [key in FontAwesomeStyle]: string; } = {
 	thin: 'Thin',
 	duotone: 'Duotone',
 	brands: 'Brands'
-}
+};
 
 /**
  * A definition of Font Awesome style classes by version.

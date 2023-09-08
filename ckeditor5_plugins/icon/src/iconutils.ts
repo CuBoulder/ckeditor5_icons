@@ -3,8 +3,11 @@
  */
 
 import type { Element, DocumentSelection } from 'ckeditor5/src/engine';
-import type { FontAwesomeVersion, FontAwesomeStyle, IconDefinition } from './icontypes';
-import { faStyleClassByVersion } from './iconconfig';
+import type { FontAwesomeVersion, FontAwesomeStyle, IconDefinition, CategoryDefinitions, IconName, IconDefinitionAlt, IconDefinitions } from './icontypes';
+import { faStyleClassByVersion, faStyleLabels } from './iconconfig';
+import type { Editor } from 'ckeditor5/src/core';
+
+let faCategories: CategoryDefinitions | undefined, faIcons: IconDefinitions | undefined, faStyles: FontAwesomeStyle[] | undefined;
 
 /**
  * @param selection 
@@ -19,6 +22,65 @@ export function getSelectedIconWidget(selection: DocumentSelection): Element | n
 		return selectedElement;
 
 	return null;
+}
+
+/**
+ * Gets all of the Font Awesome metadata and enabled styles. The metadata may need to be loaded asynchronously from an external URI.
+ * 
+ * @param editor
+ *   The editor containing the icon plugin configuration.
+ * @returns
+ *   An object containing the Font Awesome categories, icons, and styles available to the icon plugin.
+ */
+export async function getFontAwesomeMetadata(editor: Editor): Promise<{ categories: CategoryDefinitions, icons: IconDefinitions, styles: FontAwesomeStyle[] }> {
+	const config = editor.config;
+
+	if (faCategories && faIcons && faStyles)
+		return { categories: faCategories, icons: faIcons, styles: faStyles };
+
+	const faCategoriesConfig: CategoryDefinitions | undefined = config.get('icon.faCategories');
+	const faIconsConfig: Record<IconName, IconDefinition | IconDefinitionAlt> | undefined = config.get('icon.faIcons');
+	faStyles = config.get('icon.faStyles') || Object.keys(faStyleLabels) as FontAwesomeStyle[];
+
+	if (faCategoriesConfig && faIconsConfig)
+		return processFontAwesomeMetadata(faCategoriesConfig, faIconsConfig, faStyles);
+
+	const asyncMetadataURI = config.get('icon.asyncMetadataURI')!, response = await fetch(asyncMetadataURI), json = await response.json();
+	return processFontAwesomeMetadata(json.categories, json.icons, faStyles);
+}
+
+/**
+ * Processes the Font Awesome metadata by dropping non-enabled styles and converting IconDefinitionAlts into IconDefinitions if needed.
+ * 
+ * @param categories
+ * @param icons
+ * @param styles
+ * @returns
+ *   An object containing the processed Font Awesome categories and icons, and passthrough of styles.
+ */
+function processFontAwesomeMetadata(categories: CategoryDefinitions, icons: Record<IconName, IconDefinition | IconDefinitionAlt>, styles: FontAwesomeStyle[]): { categories: CategoryDefinitions, icons: IconDefinitions, styles: FontAwesomeStyle[] } {
+	for (const [iconName, iconDefinition] of Object.entries(icons)) {
+		iconDefinition.styles = iconDefinition.styles.filter(value => styles.includes(value)); // Drops any non-allowed styles from icons.
+		if (!iconDefinition.styles.length) { // Drops icons with no styles.
+			delete icons[iconName];
+			continue;
+		}
+		if ((iconDefinition as any).search_terms !== undefined){ // Trims the search terms if custom metadata is being used. For the default metadata this is taken care of already.
+			(iconDefinition as IconDefinition).search = { terms: (iconDefinition as IconDefinitionAlt).search_terms.map(term => term.trim()) };
+			delete (iconDefinition as any).search_terms;
+		}
+	}
+
+	for (const [categoryName, categoryDefinition] of Object.entries(categories)) {
+		categoryDefinition.icons = categoryDefinition.icons.filter(value => !!icons[value]); // Drops icons that don't exist from the categories.
+		if (!categoryDefinition.icons.length) // Drops categories with no icons.
+			delete categories[categoryName];
+	}
+
+	faCategories = categories;
+	faIcons = icons as IconDefinitions;
+
+	return { categories: faCategories, icons: faIcons, styles: styles };
 }
 
 /**

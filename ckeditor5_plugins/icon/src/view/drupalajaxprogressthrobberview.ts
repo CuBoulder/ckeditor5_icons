@@ -8,7 +8,7 @@ import type { Locale } from 'ckeditor5/src/utils';
 
 export default class DrupalAjaxProgressThrobberView extends View implements FocusableView {
 	/**
-	 * Constructs a new DrupalLoadingView.
+	 * Constructs a new DrupalAjaxProgressThrobberView.
 	 */
 	public constructor(locale: Locale) {
 		super(locale);

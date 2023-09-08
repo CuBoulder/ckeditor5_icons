@@ -12,8 +12,8 @@ import type ContainerElement from '@ckeditor/ckeditor5-engine/src/view/container
 import InsertIconCommand from './inserticoncommand';
 import ModifyIconCommand from './modifyiconcommand';
 import type { Size, Alignment, SizeAttributeDefinition, AlignmentAttributeDefinition, ModelAttribute, ModelAttributeDefiniton } from './iconconfig';
-import { sizeOptions, sizeDefault, alignmentOptions, alignmentDefault } from './iconconfig';
-import type { SelectableOption } from './icontypes';
+import { sizeOptions, sizeDefault, alignmentOptions, alignmentDefault, faStyleLabels, faStyleClassByVersion } from './iconconfig';
+import type { FontAwesomeStyle, SelectableOption } from './icontypes';
 
 // cSpell:ignore icon inserticoncommand
 
@@ -78,13 +78,15 @@ export default class IconEditing extends Plugin implements PluginInterface {
 	 * vice-versa.
 	 */
 	private _defineConverters() {
-		// Defines the regex for detecting an icon's style.
-		const styleRegex = /(fa-(solid|regular|light|thin|duotone|brands))|fas|far|fal|fad|fab/;
+		// Defines the values for detecting an icon's style.
+		let styleClasses: string[] = [];
+		Object.keys(faStyleLabels).forEach((value: FontAwesomeStyle) => styleClasses = styleClasses.concat(getFAStyleClasses(value)));
+		const styleRegex = new RegExp(styleClasses.join('|'), 'g');
 
 		// Converters are registered via the central editor object.
 		const { conversion } = this.editor;
 
-		// Stores the style and name of a FontAwesome icon in an attribute.
+		// Stores the style and name of a Font Awesome icon in an attribute.
 		conversion.for('upcast').attributeToAttribute({
 			model: {
 				key: 'iconClass',
@@ -179,6 +181,21 @@ function buildAttributeToAttributeClassNameDefinition<T extends string, D extend
 		},
 		view: view
 	};
+}
+
+/**
+ * @param iconStyle
+ * @returns
+ *   All the style classes for the specified Font Awesome icon style.
+ */
+function getFAStyleClasses(iconStyle: FontAwesomeStyle): string[] {
+	const faVersions = Object.keys(faStyleClassByVersion), values: string[] = [];
+	for (const faVersion of faVersions) {
+		const className = faStyleClassByVersion[faVersion][iconStyle];
+		if (className)
+			values.push(className)
+	}
+	return values;
 }
 
 /**

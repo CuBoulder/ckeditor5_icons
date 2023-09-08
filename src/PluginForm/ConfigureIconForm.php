@@ -81,7 +81,7 @@ class ConfigureIconForm extends PluginFormBase implements ContainerInjectionInte
 		$form['fa_version'] = [
 			'#type' => 'select',
 			'#title' => $this->t('Font Awesome library version'),
-			'#description' => $this->t('The selected version must match the version of the library included on your site.'),
+			'#description' => $this->t('The selected version must match the version of the library already included on the site.'),
 			'#default_value' => isset($configuration['fa_version']) ? $configuration['fa_version'] : $editorConfig['faVersion'],
 			'#options' => [
 				'6' => 'Font Awesome 6',
@@ -100,13 +100,13 @@ class ConfigureIconForm extends PluginFormBase implements ContainerInjectionInte
 		];
 		$form['async_metadata'] = [
 			'#type' => 'checkbox',
-			'#title' => $this->t('Load metadata asynchronously'),
-			'#description' => $this->t('Loads the Font Awesome metadata only when the icon picker is opened to decrease page size and load time. It\'s recommended to leave this enabled except for troubleshooting problems.'),
+			'#title' => $this->t('Load metadata asynchronously (recommended)'),
+			'#description' => $this->t('Loads the Font Awesome metadata only when the icon picker is opened to decrease the page size and load time. Also allows the metadata to be cached by browsers. It\'s recommended to leave this enabled except for troubleshooting problems.'),
 			'#default_value' => $configuration['async_metadata']
 		];
 		$form['fa_styles'] = [
 			'#type' => 'fieldset',
-			'#title' => $this->t('Font Awesome styles')
+			'#title' => $this->t('Enabled Font Awesome styles')
 		];
 		foreach ($faStyles as $styleName => $style) {
 			$formElementId = 'fa_styles_' . $styleName;

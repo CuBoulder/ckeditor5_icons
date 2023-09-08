@@ -161,7 +161,7 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 		} else { // Provides the synchronous metadata.
 			if ($customMetadata) {
 				$dynamicConfig['faCategories'] = $this->fontAwesomeManager->getCategories();
-				$dynamicConfig['faIcons'] = $this->fontAwesomeManager->getMetadata();
+				$dynamicConfig['faIcons'] = $this->fontAwesomeManager->getIcons();
 			} else {
 				$dynamicConfig['faCategories'] = $this->service->getFACategories($faVersion);
 				$dynamicConfig['faIcons'] = $this->service->getFAIcons($faVersion);
