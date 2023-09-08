@@ -91,19 +91,43 @@ class CKEditor5Icons implements CKEditor5IconsInterface {
 	 */
 	public function getFAStyles() {
 		return [
-			'solid' => ['label' => 'Solid', 'pro' => FALSE],
-			'regular' => ['label' => 'Regular', 'pro' => FALSE],
-			'light' => ['label' => 'Light', 'pro' => TRUE],
-			'thin' => ['label' => 'Thin', 'pro' => TRUE],
-			'duotone' => ['label' => 'Duotone', 'pro' => TRUE],
-			'brands' => ['label' => 'Brands', 'pro' => FALSE]
+			'solid' => [
+				'label' => 'Solid',
+				'pro' => FALSE,
+				'compatibility' => ['5', '6']
+			],
+			'regular' => [
+				'label' => 'Regular',
+				'pro' => FALSE,
+				'compatibility' => ['5', '6']
+			],
+			'light' => [
+				'label' => 'Light',
+				'pro' => TRUE,
+				'compatibility' => ['5', '6']
+			],
+			'thin' => [
+				'label' => 'Thin',
+				'pro' => TRUE,
+				'compatibility' => ['6']
+			],
+			'duotone' => [
+				'label' => 'Duotone',
+				'pro' => TRUE,
+				'compatibility' => ['5', '6']
+			],
+			'brands' => [
+				'label' => 'Brands',
+				'pro' => FALSE,
+				'compatibility' => ['5', '6']
+			]
 		];
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	public function toValidFAVersion($faVersion) {
-		return $faVersion === '5' ? $faVersion : '6';
+	public function toValidFAVersion($value) {
+		return $value === '5' ? $value : '6';
 	}
 }

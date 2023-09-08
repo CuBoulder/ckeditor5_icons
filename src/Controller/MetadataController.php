@@ -105,7 +105,7 @@ class MetadataController extends ControllerBase implements ContainerInjectionInt
 		$this->addHeaders($response);
 		$response->setContent(Json::encode([
 			'categories' => $this->fontAwesomeManager->getCategories(),
-			'icons' => $this->fontAwesomeManager->getMetadata()
+			'icons' => $this->fontAwesomeManager->getIcons()
 		]));
 		return $response;
 	}
@@ -119,5 +119,8 @@ class MetadataController extends ControllerBase implements ContainerInjectionInt
 	protected function addHeaders($response) {
 		$response->headers->set('Content-Type', 'application/json');
 		$response->headers->set('Access-Control-Allow-Origin', $this->request->getSchemeAndHttpHost());
+		// Allows browser caching of the metadata.
+		$response->setCache(['public' => TRUE]);
+		$response->setExpires(new \DateTimeImmutable('+1 day'));
 	}
 }

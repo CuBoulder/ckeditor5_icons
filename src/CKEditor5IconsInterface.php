@@ -37,11 +37,11 @@ interface CKEditor5IconsInterface {
 	public function getFAStyles();
 
 	/**
-	 * @param mixed $faVersion
-	 *   A likely valid Font Awesome version (optional).
+	 * @param mixed $version
+	 *   A parameter to evaluate.
 	 * @return string
 	 *   '5' or '6' as a valid Font Awesome version (defaults to 6).
 	 */
-	public function toValidFAVersion($faVersion);
+	public function toValidFAVersion($value);
 
 }

@@ -26,19 +26,9 @@ declare module 'ckeditor5/src/widget' {
 }
 
 
-// Enables importing any Font Awesome 6 Free icons directly into the TypeScript.
+// Enables importing SVG files as strings.
 
-declare module 'fontawesome6/svgs/solid/*.svg' {
-	const content: string;
-	export default content;
-}
-
-declare module 'fontawesome6/svgs/regular/*.svg' {
-	const content: string;
-	export default content;
-}
-
-declare module 'fontawesome6/svgs/brands/*.svg' {
+declare module '*.svg' {
 	const content: string;
 	export default content;
 }

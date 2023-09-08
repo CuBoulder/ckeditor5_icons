@@ -103,9 +103,9 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 	 */
 	public function defaultConfiguration() {
 		return [
-			'custom_metadata' => false,
+			'custom_metadata' => FALSE,
 			'async_metadata' => TRUE,
-			'recommended_enabled' => false
+			'recommended_enabled' => FALSE
 		];
 	}
 
@@ -147,10 +147,15 @@ class Icon extends CKEditor5PluginDefault implements CKEditor5PluginConfigurable
 		if ($this->configuration['async_metadata']) { // Provides the CSRF-protected ajax URI for asynchronous metadata loading.
 			$url = Url::fromRoute('ckeditor5_icons.fontawesome' . ($customMetadata ? '' : $faVersion) . '_metadata');
 			// Strips the leading `/` and query string from the URI to give it to the CSRF token generator.
-			$tokenURI = substr($url->toString(), 1);
-			$tokenURI = substr($tokenURI, 0, strpos($tokenURI, '?'));
-			// Generates and adds the CSRF token as a query parameter.
-			$url->setOptions(['query' => ['token' => $this->tokenGenerator->get($tokenURI)]]);
+			$tokenId = substr($url->toString(), 1);
+			$queryStringPos = strpos($tokenId, '?');
+			if ($queryStringPos !== FALSE)
+				$tokenId = substr($tokenId, 0, $queryStringPos);
+			$query = [];
+			if (!$customMetadata)
+				$query['version'] = $this->service->getPreciseLibraryVersions()['fontawesome' . $faVersion];
+			$query['token'] = $this->tokenGenerator->get($tokenId); // Generates and adds the CSRF token as a query parameter.
+			$url->setOptions(['query' => $query]);
 			// Sets `asyncMetadataURI` to the full URI with CSRF token.
 			$dynamicConfig['asyncMetadataURI'] = $url->toString();
 		} else { // Provides the synchronous metadata.

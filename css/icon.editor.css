@@ -56,7 +56,7 @@
 }
 
 .ck .ck.ckeditor5-icons__picker-header > :nth-child(2) .ck.ck-dropdown__panel {
-	max-height: 350px;
+	max-height: 300px;
 	overflow-x: hidden;
 	overflow-y: auto;
 }

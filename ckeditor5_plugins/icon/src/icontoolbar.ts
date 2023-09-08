@@ -11,7 +11,7 @@ import type { Size, Alignment } from './iconconfig';
 import { sizeOptions, sizeDefault, alignmentOptions, alignmentDefault } from './iconconfig';
 import { Plugin, icons } from 'ckeditor5/src/core';
 import { WidgetToolbarRepository } from 'ckeditor5/src/widget';
-import type { SelectableOption } from './icontypes';
+import type { FontAwesomeVersion, SelectableOption } from './icontypes';
 import type ModifyIconCommand from './modifyiconcommand';
 import { createButton } from './view/viewutils';
 
@@ -29,13 +29,14 @@ export default class IconToolbar extends Plugin implements PluginInterface {
 	public init() {
 		const editor = this.editor,
 			commands = editor.commands,
-			componentFactory = editor.ui.componentFactory;
+			componentFactory = editor.ui.componentFactory,
+			faVersion = editor.config.get('icon.faVersion') || '6';
 
 		// Makes size and alignment options avaliable to the widget toolbar.
 		componentFactory.add('iconSize', locale =>
-			createToolbarDropdown<Size>(locale, 'Icon size', sizeOptions[sizeDefault].icon, icons.objectSizeFull, commands.get('sizeIcon')!, sizeOptions, sizeDefault));
+			createToolbarDropdown<Size>(locale, faVersion, 'Icon size', sizeOptions[sizeDefault].icon, icons.objectSizeFull, commands.get('sizeIcon')!, sizeOptions, sizeDefault));
 		componentFactory.add('iconAlignment', locale =>
-			createToolbarDropdown<Alignment>(locale, 'Icon alignment', alignmentOptions[alignmentDefault].icon, null, commands.get('alignIcon')!, alignmentOptions, alignmentDefault));
+			createToolbarDropdown<Alignment>(locale, faVersion, 'Icon alignment', alignmentOptions[alignmentDefault].icon, null, commands.get('alignIcon')!, alignmentOptions, alignmentDefault));
 	}
 
 	/**
@@ -60,9 +61,9 @@ export default class IconToolbar extends Plugin implements PluginInterface {
  * @returns
  *   The dropdown.
  */
-function createToolbarDropdown<T extends string>(locale: Locale, label: string, icon: string | null | undefined, fallbackIcon: string | null | undefined, command: ModifyIconCommand<T>, options: Record<T, SelectableOption>, defaultValue: T): DropdownView {
+function createToolbarDropdown<T extends string>(locale: Locale, faVersion: FontAwesomeVersion, label: string, icon: string | null | undefined, fallbackIcon: string | null | undefined, command: ModifyIconCommand<T>, options: Record<T, SelectableOption>, defaultValue: T): DropdownView {
 	const dropdownView = createDropdown(locale), buttonView = dropdownView.buttonView, t = locale.t;
-	addToolbarToDropdown(dropdownView, Object.entries<SelectableOption>(options).map(([optionValue, option]: [T, SelectableOption]) =>
+	addToolbarToDropdown(dropdownView, Object.entries<SelectableOption>(options).filter(([_optionValue, option]) => !option.compatibility || option.compatibility.includes(faVersion)).map(([optionValue, option]: [T, SelectableOption]) =>
 		createToolbarButton<T>(locale, option.label, option.icon, command, optionValue)));
 	buttonView.set({
 		label: t(label),

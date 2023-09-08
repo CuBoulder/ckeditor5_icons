@@ -2,8 +2,9 @@
  * @file defines configuration for the icon plugin.
  */
 
-import type { FontAwesomeVersion, FontAwesomeStyle, SelectableOption, CategoryDefinitions, IconName, IconDefinitions } from './icontypes';
+import type { FontAwesomeVersion, FontAwesomeStyle, SelectableOption, CategoryDefinitions, IconName, IconDefinition, IconDefinitionAlt } from './icontypes';
 import { icons } from 'ckeditor5/src/core';
+import objectSizeExtraSmall from '../../../icons/object-size-extra-small.svg';
 
 /**
  * The options available in `editor.config.get('icon')`.
@@ -12,7 +13,7 @@ export interface IconConfig {
 	faVersion?: FontAwesomeVersion;
 	faCategories?: CategoryDefinitions;
 	faStyles?: FontAwesomeStyle[];
-	faIcons?: IconDefinitions;
+	faIcons?: Record<IconName, IconDefinition | IconDefinitionAlt>;
 	recommendedIcons?: IconName[] | null;
 	customMetadata?: boolean;
 	asyncMetadataURI: string;
@@ -28,7 +29,7 @@ export type SizeAttributeDefinition = ModelAttributeDefiniton<Size, 'iconSize'>;
 export const sizeOptions: { [key in Size]: SelectableOption; } = {
 	extraSmall: {
 		label: 'Extra Small',
-		icon: icons.objectSizeSmall,
+		icon: objectSizeExtraSmall,
 		className: 'fa-xs'
 	},
 	small: {
@@ -48,7 +49,8 @@ export const sizeOptions: { [key in Size]: SelectableOption; } = {
 	extraLarge: {
 		label: 'Extra Large',
 		icon: icons.objectSizeFull,
-		className: 'fa-xl'
+		className: 'fa-xl',
+		compatibility: ['6']
 	},
 	'2x': {
 		label: '2x',

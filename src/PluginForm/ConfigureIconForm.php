@@ -108,16 +108,16 @@ class ConfigureIconForm extends PluginFormBase implements ContainerInjectionInte
 			'#type' => 'fieldset',
 			'#title' => $this->t('Font Awesome styles')
 		];
-		array_walk($faStyles, function($style, $styleName) use ($configuration, $editorConfig, &$form) {
+		foreach ($faStyles as $styleName => $style) {
 			$formElementId = 'fa_styles_' . $styleName;
 			$form['fa_styles'][$formElementId] = [
 				'#type' => 'checkbox',
-				'#title' => $this->t($style['label']),
+				'#title' => $style['label'],
 				'#default_value' => in_array($styleName, isset($configuration['fa_styles']) ? $configuration['fa_styles'] : $editorConfig['faStyles'])
 			];
 			if ($style['pro'])
 				$form['fa_styles'][$formElementId]['#description'] = $this->t('Requires Font Awesome Pro.');
-		});
+		}
 		$form['recommended_enabled'] = [
 			'#type' => 'checkbox',
 			'#title' => $this->t('Show the Recommended category'),
@@ -137,16 +137,22 @@ class ConfigureIconForm extends PluginFormBase implements ContainerInjectionInte
 	 * {@inheritdoc}
 	 */
 	public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+		$faVersion = $this->service->toValidFAVersion($form_state->getValue('fa_version'));
 		$faStyles = $this->service->getFAStyles();
+
 		$selectedStyles = [];
-
-		array_walk($faStyles, function($style, $styleName) use ($form_state, &$selectedStyles) {
+		foreach ($faStyles as $styleName => $style) {
 			$formElementId = 'fa_styles_' . $styleName;
-			if ($form_state->getValue('fa_styles')[$formElementId])
+			if ($form_state->getValue('fa_styles')[$formElementId]) {
 				$selectedStyles[] = $styleName;
-		});
+				if (!in_array($faVersion, $style['compatibility'])) {
+					$form_state->setError($form['fa_styles'][$formElementId], $this->t('The %s style is incompatible with the selected version of the Font Awesome library.', ['%s' => $style['label']]));
+					return;
+				}
+			}
+		}
 
-		$form_state->setValue('fa_version', $this->service->toValidFAVersion($form_state->getValue('fa_version')));
+		$form_state->setValue('fa_version', $faVersion);
 		$form_state->setValue('fa_styles', $selectedStyles);
 		$form_state->setValue('custom_metadata', (bool) $form_state->getValue('custom_metadata'));
 		$form_state->setValue('async_metatdata', (bool) $form_state->getValue('async_metatdata'));
@@ -162,7 +168,7 @@ class ConfigureIconForm extends PluginFormBase implements ContainerInjectionInte
 	 */
 	public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
 		$configuration = $this->plugin->getConfiguration();
-	
+
 		$configuration['fa_version'] = $form_state->getValue('fa_version');
 		$configuration['fa_styles'] = $form_state->getValue('fa_styles');
 		$configuration['custom_metadata'] = $form_state->getValue('custom_metadata');
@@ -171,7 +177,7 @@ class ConfigureIconForm extends PluginFormBase implements ContainerInjectionInte
 		$recommendedIcons = $form_state->getValue('recommended_icons');
 		if ($configuration['recommended_enabled'] || isset($configuration['recommended_icons']) || $recommendedIcons != static::recommendedDefaultIcons)
 			$configuration['recommended_icons'] = $form_state->getValue('recommended_icons');
-	
+
 		$this->plugin->setConfiguration($configuration);
 	}
 }
