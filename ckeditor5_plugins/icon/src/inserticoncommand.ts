@@ -13,13 +13,13 @@ export default class InsertIconCommand extends Command {
 	/**
 	 * @inheritdoc
 	 */
-	public override execute({ iconClass = 'fa-solid fa-chess-rook' }) {
+	public override execute({ iconFA, iconStyle }) {
 		const { editing, model } = this.editor;
 
 		model.change((writer) => {
 			// Insert <icon></icon> at the current selection position
 			// in a way that will result in creating a valid model structure.
-			const iconElement = writer.createElement('icon', { iconClass });
+			const iconElement = writer.createElement('icon', { iconFA, iconStyle });
 			model.insertContent(iconElement);
 			editing.view.focus();
 			writer.setSelection(iconElement, 'on');

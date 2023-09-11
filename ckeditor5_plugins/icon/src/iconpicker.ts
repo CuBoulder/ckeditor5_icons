@@ -9,7 +9,7 @@ import { createDropdown } from 'ckeditor5/src/ui';
 import iconsIcon from 'fontawesome6/svgs/solid/icons.svg';
 import type { InsertIconEvent } from './view/iconpickerview';
 import IconPickerView from './view/iconpickerview';
-import { getFAStyleClass, getFontAwesomeMetadata } from './iconutils';
+import { getFontAwesomeMetadata } from './iconutils';
 import type { FontAwesomeStyle, FontAwesomeVersion, CategoryDefinitions, IconDefinitions, IconName } from './icontypes';
 import { Locale } from 'ckeditor5/src/utils';
 import DrupalAjaxProgressThrobberView from './view/drupalajaxprogressthrobberview';
@@ -79,7 +79,7 @@ export default class IconPicker extends Plugin implements PluginInterface {
 	private _createIconPickerView(locale: Locale, command: Command, faVersion: FontAwesomeVersion, faCategories: CategoryDefinitions, faIcons: IconDefinitions, styles: FontAwesomeStyle[], recommendedIcons?: IconName[] | null): IconPickerView {
 		const iconPickerView = new IconPickerView(locale, faVersion, faCategories, faIcons, styles, recommendedIcons);
 		this.listenTo<InsertIconEvent>(iconPickerView, 'execute', (_eventInfo, iconName, iconStyle) => { // Inserts the icon when the icon picker view fires the `execute` event.
-			command.execute({ iconClass: getFAStyleClass(faVersion, iconStyle) + ' fa-' + iconName });
+			command.execute({ iconFA: iconName, iconStyle });
 		});
 		return iconPickerView;
 	}

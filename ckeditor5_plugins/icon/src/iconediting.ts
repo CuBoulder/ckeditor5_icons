@@ -6,14 +6,16 @@ import type { PluginInterface } from '@ckeditor/ckeditor5-core/src/plugin';
 import type { PluginDependencies } from 'ckeditor5/src/core';
 import { Plugin } from 'ckeditor5/src/core';
 import { Widget, toWidget } from 'ckeditor5/src/widget';
-import type { DowncastWriter } from 'ckeditor5/src/engine';
+import type { DowncastWriter, UpcastConversionApi } from 'ckeditor5/src/engine';
+import type { ViewElement } from 'ckeditor5/src/engine';
 import type ModelElement from '@ckeditor/ckeditor5-engine/src/model/element';
 import type ContainerElement from '@ckeditor/ckeditor5-engine/src/view/containerelement';
 import InsertIconCommand from './inserticoncommand';
 import ModifyIconCommand from './modifyiconcommand';
 import type { Size, Alignment, SizeAttributeDefinition, AlignmentAttributeDefinition, ModelAttribute, ModelAttributeDefiniton } from './iconconfig';
 import { sizeOptions, sizeDefault, alignmentOptions, alignmentDefault, faStyleLabels, faStyleClassByVersion } from './iconconfig';
-import type { FontAwesomeStyle, SelectableOption } from './icontypes';
+import type { FontAwesomeStyle, FontAwesomeVersion, SelectableOption } from './icontypes';
+import { getFAStyleClass } from './iconutils';
 
 // cSpell:ignore icon inserticoncommand
 
@@ -59,7 +61,7 @@ export default class IconEditing extends Plugin implements PluginInterface {
 		// Schemas are registered via the central `editor` object.
 		const schema = this.editor.model.schema;
 
-		const allowAttributes: ModelAttribute[] = ['iconClass', 'iconSize', 'iconAlignment'];
+		const allowAttributes: ModelAttribute[] = ['iconFA', 'iconStyle', 'iconSize', 'iconAlignment'];
 
 		schema.register('icon', {
 			// Behaves like a self-contained object (e.g. an image).
@@ -78,34 +80,17 @@ export default class IconEditing extends Plugin implements PluginInterface {
 	 * vice-versa.
 	 */
 	private _defineConverters() {
+		const faVersion = this.editor.config.get('icon.faVersion') || '6';
+
 		// Defines the values for detecting an icon's style.
-		let styleClasses: string[] = [];
-		Object.keys(faStyleLabels).forEach((value: FontAwesomeStyle) => styleClasses = styleClasses.concat(getFAStyleClasses(value)));
-		const styleRegex = new RegExp(styleClasses.join('|'), 'g');
+		const faStyles = Object.keys(faStyleLabels) as (keyof typeof faStyleLabels)[], styleClassNames: Record<string, FontAwesomeStyle> = {};
+		faStyles.forEach(value => {
+			const classesForStyle = getFAStyleClasses(value);
+			classesForStyle.forEach((className: string) => styleClassNames[className] = value);
+		});
 
 		// Converters are registered via the central editor object.
 		const { conversion } = this.editor;
-
-		// Stores the style and name of a Font Awesome icon in an attribute.
-		conversion.for('upcast').attributeToAttribute({
-			model: {
-				key: 'iconClass',
-				value: (viewElement: Element) => {
-					if (!viewElement.hasAttribute('class'))
-						return '';
-					const classNames = viewElement.getAttribute('class')!.match(/(fa-([a-z0-9\-]+)|fas|far|fal|fad|fab)/g);
-					let iconClass = '';
-					if (classNames) {
-						for (const className of classNames) {
-							if (!className.match(/fa-(2xs|xs|sm|lg|xl|2xl|([0-9]|10)x)/) && !className.match(/fa-(pull-left|pull-right)/)) // Filters out the dedicated attributes.
-								iconClass = iconClass ? iconClass + ' ' + className : className;
-						}
-					}
-					return iconClass;
-				}
-			},
-			view: 'class'
-		});
 
 		// The size and alignment attributes converts to element class names.
 		conversion.attributeToAttribute(buildAttributeToAttributeClassNameDefinition<Size, SizeAttributeDefinition>('iconSize', sizeOptions));
@@ -118,10 +103,23 @@ export default class IconEditing extends Plugin implements PluginInterface {
 		// processed by CKEditor, then CKEditor recognizes and loads it as a
 		// <icon> model.
 		conversion.for('upcast').elementToElement({
-			model: 'icon',
+			model: (viewElement: ViewElement, { writer }: UpcastConversionApi) => {
+				const element = writer.createElement('icon'), classNames = viewElement.getClassNames();
+				let iconFA = '', iconStyle: FontAwesomeStyle = faStyles[0]!;
+				for (const className of classNames) {
+					let faMatch: RegExpMatchArray | null;
+					if (styleClassNames[className])
+						iconStyle = styleClassNames[className]!;
+					else if ((faMatch = className.match(/fa-([a-z0-9\-]+)/)) && !className.match(/fa-(2xs|xs|sm|lg|xl|2xl|([0-9]|10)x)/) && !className.match(/fa-(pull-left|pull-right)/))
+						iconFA += faMatch[1];
+				}
+				writer.setAttribute('iconFA', iconFA, element);
+				writer.setAttribute('iconStyle', iconStyle, element);
+				return element;
+			},
 			view: {
 				name: 'i',
-				classes: styleRegex
+				classes: new RegExp(Object.keys(styleClassNames).join('|'))
 			}
 		});
 
@@ -132,7 +130,7 @@ export default class IconEditing extends Plugin implements PluginInterface {
 		// <i></i>.
 		conversion.for('dataDowncast').elementToElement({
 			model: 'icon',
-			view: (modelElement, { writer: viewWriter }) => createIconView(modelElement, viewWriter)
+			view: (modelElement, { writer: viewWriter }) => createIconView(modelElement, viewWriter, faVersion)
 		});
 
 		// Editing Downcast Converters. These render the content to the user for
@@ -143,7 +141,7 @@ export default class IconEditing extends Plugin implements PluginInterface {
 		// Convert the <icon> model into a container widget in the editor UI.
 		conversion.for('editingDowncast').elementToElement({
 			model: 'icon',
-			view: (modelElement, { writer: viewWriter }) => createIconWidgetView(modelElement, viewWriter)
+			view: (modelElement, { writer: viewWriter }) => createIconWidgetView(modelElement, viewWriter, faVersion)
 		});
 	}
 
@@ -201,27 +199,41 @@ function getFAStyleClasses(iconStyle: FontAwesomeStyle): string[] {
 /**
  * @param modelElement
  *   The model element.
- * @param viewWriter
- *   The downcast writer.
+ * @param faVersion
+ *   The version of Font Awesome being used.
  * @returns
- *   The icon container element or widget.
+ *   The class name of the icon (e.g. `fa-solid fa-chess-rook`).
  */
-function createIconView(modelElement: ModelElement, viewWriter: DowncastWriter): ContainerElement {
-	const iconClass = modelElement.getAttribute('iconClass');
-	return viewWriter.createContainerElement('i', { class: iconClass });
+function getIconClassName(modelElement: ModelElement, faVersion: FontAwesomeVersion): string {
+	return getFAStyleClass(faVersion, modelElement.getAttribute('iconStyle') as FontAwesomeStyle) + (modelElement.getAttribute('iconFA') as string).split(' ').map(value => value ? ' fa-' + value : '');
 }
 
 /**
-* @param modelElement
+ * @param modelElement
  *   The model element.
  * @param viewWriter
  *   The downcast writer.
+ * @param faVersion
+ *   The version of Font Awesome being used.
  * @returns
  *   The icon container element or widget.
  */
-function createIconWidgetView(modelElement: ModelElement, viewWriter: DowncastWriter): ContainerElement {
-	const iconClass = modelElement.getAttribute('iconClass');
+function createIconView(modelElement: ModelElement, viewWriter: DowncastWriter, faVersion: FontAwesomeVersion): ContainerElement {
+	return viewWriter.createContainerElement('i', { class: getIconClassName(modelElement, faVersion) });
+}
+
+/**
+ * @param modelElement
+ *   The model element.
+ * @param viewWriter
+ *   The downcast writer.
+ * @param faVersion
+ *   The version of Font Awesome being used.
+ * @returns
+ *   The icon container element or widget.
+ */
+function createIconWidgetView(modelElement: ModelElement, viewWriter: DowncastWriter, faVersion: FontAwesomeVersion): ContainerElement {
 	return toWidget(
-		viewWriter.createContainerElement('span', { class: 'ckeditor5-icons__widget' }, [viewWriter.createRawElement('span', {}, element => element.innerHTML = '<i class="' + iconClass + '"></i>')]), viewWriter, { label: 'icon widget' }
+		viewWriter.createContainerElement('span', { class: 'ckeditor5-icons__widget' }, [viewWriter.createRawElement('span', {}, element => element.innerHTML = '<i class="' + getIconClassName(modelElement, faVersion) + '"></i>')]), viewWriter, { label: 'icon widget' }
 	);
 }

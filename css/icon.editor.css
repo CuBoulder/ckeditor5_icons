@@ -1,4 +1,23 @@
 /*
+ * == Icon widget styles ==
+ */
+
+.ck .ckeditor5-icons__widget {
+	line-height: .1em;
+}
+
+.ck .ckeditor5-icons__widget.fa-pull-left {
+	float: left;
+	margin-right: var(--fa-pull-margin, .3em);
+}
+
+.ck .ckeditor5-icons__widget.fa-pull-right {
+	float: right;
+	margin-left: var(--fa-pull-margin, .3em);
+}
+
+
+/*
  * === Icon picker styles ===
  */
 

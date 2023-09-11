@@ -19,7 +19,7 @@ export interface IconConfig {
 	asyncMetadataURI: string;
 };
 
-export type ModelAttribute = 'iconClass' | 'iconSize' | 'iconAlignment';
+export type ModelAttribute = 'iconFA' | 'iconStyle' | 'iconSize' | 'iconAlignment';
 
 export type ModelAttributeDefiniton<T extends string = string, A extends ModelAttribute = ModelAttribute> = [T, A];
 
