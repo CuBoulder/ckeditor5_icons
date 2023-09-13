@@ -9,7 +9,7 @@ import { createDropdown } from 'ckeditor5/src/ui';
 import iconsIcon from 'fontawesome6/svgs/solid/icons.svg';
 import type { InsertIconEvent } from './view/iconpickerview';
 import IconPickerView from './view/iconpickerview';
-import { getFontAwesomeMetadata } from './iconutils';
+import { getFontAwesomeMetadata, metadataLoaded } from './iconutils';
 import type { FontAwesomeStyle, FontAwesomeVersion, CategoryDefinitions, IconDefinitions, IconName } from './icontypes';
 import { Locale } from 'ckeditor5/src/utils';
 import DrupalAjaxProgressThrobberView from './view/drupalajaxprogressthrobberview';
@@ -29,7 +29,7 @@ export default class IconPicker extends Plugin implements PluginInterface {
 		// Registers the icon toolbar button.
 		componentFactory.add('icon', locale => {
 			const dropdownView = createDropdown(locale);
-			let iconPickerView: IconPickerView | undefined, loadingView: DrupalAjaxProgressThrobberView | null | undefined, lastRequestTime: number | undefined;
+			let iconPickerView: IconPickerView | undefined, loadingView: DrupalAjaxProgressThrobberView | null = null, lastRequestTime: number | undefined;
 
 			// Creates the toolbar button.
 			dropdownView.buttonView.set({
@@ -44,13 +44,15 @@ export default class IconPicker extends Plugin implements PluginInterface {
 			// Handles the opening of the icon picker modal.
 			dropdownView.on('change:isOpen', async () => {
 				if (!iconPickerView) {
-					const now = Date.now();
-					if (lastRequestTime && now - lastRequestTime < 1000) return; // Prevents request spamming.
-					lastRequestTime = now;
-					if (!loadingView) { // Shows the loading spinner.
-						loadingView = new DrupalAjaxProgressThrobberView(locale);
-						loadingView.extendTemplate({ attributes: { class: ['ck', 'ckeditor5-icons__picker-loading'], tabindex: '-1' } });
-						dropdownView.panelView.children.add(loadingView);
+					if (!metadataLoaded()) {
+						const now = Date.now();
+						if (lastRequestTime && now - lastRequestTime < 1000) return; // Prevents request spamming.
+						lastRequestTime = now;
+						if (!loadingView) { // Shows the loading spinner.
+							loadingView = new DrupalAjaxProgressThrobberView(locale);
+							loadingView.extendTemplate({ attributes: { class: ['ck', 'ckeditor5-icons__picker-loading'], tabindex: '-1' } });
+							dropdownView.panelView.children.add(loadingView);
+						}
 					}
 					const { categories, icons, styles } = await getFontAwesomeMetadata(this.editor);
 					if (!iconPickerView) { // A previous request may have already resolved and been handled.

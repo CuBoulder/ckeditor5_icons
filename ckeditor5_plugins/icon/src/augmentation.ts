@@ -1,4 +1,5 @@
-import type { Alignment, AlignmentAttributeDefinition, IconConfig, Size, SizeAttributeDefinition } from './iconconfig';
+import type { Alignment, AlignmentAttributeDefinition, IconConfig, Size, SizeAttributeDefinition, StyleAttributeDefinition } from './iconconfig';
+import type { FontAwesomeStyle } from './icontypes';
 import type InsertIconCommand from './inserticoncommand';
 import type ModifyIconCommand from './modifyiconcommand';
 
@@ -8,6 +9,7 @@ declare module '@ckeditor/ckeditor5-core' {
 	}
 	interface CommandsMap {
 		insertIcon: InsertIconCommand;
+		styleIcon: ModifyIconCommand<FontAwesomeStyle, StyleAttributeDefinition>;
 		sizeIcon: ModifyIconCommand<Size, SizeAttributeDefinition>;
 		alignIcon: ModifyIconCommand<Alignment, AlignmentAttributeDefinition>;
 	}

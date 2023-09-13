@@ -25,6 +25,14 @@ export function getSelectedIconWidget(selection: DocumentSelection): Element | n
 }
 
 /**
+ * @returns
+ *   `true` if the metadata has been loaded, `false` if not.
+ */
+export function metadataLoaded(): boolean {
+	return !!(faCategories && faIcons && faStyles);
+}
+
+/**
  * Gets all of the Font Awesome metadata and enabled styles. The metadata may need to be loaded asynchronously from an external URI.
  * 
  * @param editor

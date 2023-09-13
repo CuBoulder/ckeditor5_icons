@@ -113,6 +113,9 @@ export const alignmentOptions: { [key in Alignment]: SelectableOption; } = {
 };
 export const alignmentDefault: Alignment = 'none';
 
+// === Styles ===
+export type StyleAttributeDefinition = ModelAttributeDefiniton<FontAwesomeStyle, 'iconStyle'>;
+
 /**
  * Labels for all the style options.
  */
@@ -124,6 +127,8 @@ export const faStyleLabels: { [key in FontAwesomeStyle]: string; } = {
 	duotone: 'Duotone',
 	brands: 'Brands'
 };
+
+export const styleDefault = Object.keys(faStyleLabels)[0] as FontAwesomeStyle;
 
 /**
  * A definition of Font Awesome style classes by version.

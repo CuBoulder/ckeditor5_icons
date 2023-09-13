@@ -6,14 +6,14 @@ import type { PluginInterface } from '@ckeditor/ckeditor5-core/src/plugin';
 import type { PluginDependencies } from 'ckeditor5/src/core';
 import { Plugin } from 'ckeditor5/src/core';
 import { Widget, toWidget } from 'ckeditor5/src/widget';
-import type { DowncastWriter, UpcastConversionApi } from 'ckeditor5/src/engine';
+import type { DowncastAttributeEvent, DowncastWriter, UpcastConversionApi } from 'ckeditor5/src/engine';
 import type { ViewElement } from 'ckeditor5/src/engine';
 import type ModelElement from '@ckeditor/ckeditor5-engine/src/model/element';
 import type ContainerElement from '@ckeditor/ckeditor5-engine/src/view/containerelement';
 import InsertIconCommand from './inserticoncommand';
 import ModifyIconCommand from './modifyiconcommand';
-import type { Size, Alignment, SizeAttributeDefinition, AlignmentAttributeDefinition, ModelAttribute, ModelAttributeDefiniton } from './iconconfig';
-import { sizeOptions, sizeDefault, alignmentOptions, alignmentDefault, faStyleLabels, faStyleClassByVersion } from './iconconfig';
+import type { Size, Alignment, SizeAttributeDefinition, AlignmentAttributeDefinition, ModelAttribute, ModelAttributeDefiniton, StyleAttributeDefinition } from './iconconfig';
+import { sizeOptions, sizeDefault, alignmentOptions, alignmentDefault, faStyleLabels, faStyleClassByVersion, styleDefault } from './iconconfig';
 import type { FontAwesomeStyle, FontAwesomeVersion, SelectableOption } from './icontypes';
 import { getFAStyleClass } from './iconutils';
 
@@ -105,7 +105,7 @@ export default class IconEditing extends Plugin implements PluginInterface {
 		conversion.for('upcast').elementToElement({
 			model: (viewElement: ViewElement, { writer }: UpcastConversionApi) => {
 				const element = writer.createElement('icon'), classNames = viewElement.getClassNames();
-				let iconFA = '', iconStyle: FontAwesomeStyle = faStyles[0]!;
+				let iconFA = '', iconStyle: FontAwesomeStyle = styleDefault;
 				for (const className of classNames) {
 					let faMatch: RegExpMatchArray | null;
 					if (styleClassNames[className])
@@ -143,6 +143,16 @@ export default class IconEditing extends Plugin implements PluginInterface {
 			model: 'icon',
 			view: (modelElement, { writer: viewWriter }) => createIconWidgetView(modelElement, viewWriter, faVersion)
 		});
+
+		// Converts the model again in the event that `iconStyle` is changed to ensure the embedded raw element gets updated.
+		conversion.for('editingDowncast').add(dispatcher => {
+			dispatcher.on<DowncastAttributeEvent>('attribute:iconStyle', (_evt, data, conversionApi) => {
+				if (data.attributeOldValue && !conversionApi.consumable.consume(data.item, 'insert')) {
+					conversionApi.writer.remove(conversionApi.mapper.toViewRange(data.range));
+					conversionApi.convertItem(data.item as ModelElement);
+				}
+			});
+		});
 	}
 
 	/**
@@ -151,6 +161,7 @@ export default class IconEditing extends Plugin implements PluginInterface {
 	private _defineCommands() {
 		const editor = this.editor, commands = editor.commands;
 		commands.add('insertIcon', new InsertIconCommand(editor));
+		commands.add('styleIcon', new ModifyIconCommand<FontAwesomeStyle, StyleAttributeDefinition>(editor, 'iconStyle', styleDefault));
 		commands.add('sizeIcon', new ModifyIconCommand<Size, SizeAttributeDefinition>(editor, 'iconSize', sizeDefault));
 		commands.add('alignIcon', new ModifyIconCommand<Alignment, AlignmentAttributeDefinition>(editor, 'iconAlignment', alignmentDefault));
 	}
