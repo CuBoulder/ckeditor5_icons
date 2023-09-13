@@ -23,7 +23,7 @@ export default class IconPicker extends Plugin implements PluginInterface {
 			command = commands.get('insertIcon')!,
 			componentFactory = ui.componentFactory;
 
-		const faVersion: FontAwesomeVersion = config.get('icon.faVersion') || '6';
+		const faVersion: FontAwesomeVersion = config.get('icon.faVersion')!;
 		const recommendedIcons: IconName[] | null | undefined = config.get('icon.recommendedIcons');
 
 		// Registers the icon toolbar button.

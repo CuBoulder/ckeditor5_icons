@@ -33,7 +33,7 @@ export default class IconToolbar extends Plugin implements PluginInterface {
 		const editor = this.editor,
 			commands = editor.commands,
 			componentFactory = editor.ui.componentFactory,
-			faVersion = editor.config.get('icon.faVersion') || '6';
+			faVersion = editor.config.get('icon.faVersion')!;
 
 		// Makes size and alignment options avaliable to the widget toolbar.
 		componentFactory.add('iconSize', locale =>
@@ -50,7 +50,7 @@ export default class IconToolbar extends Plugin implements PluginInterface {
 		const editor = this.editor;
 		const widgetToolbarRepository = editor.plugins.get(WidgetToolbarRepository);
 		widgetToolbarRepository.register('icon', {
-			items: ['iconSize', 'iconAlignment', 'iconStyle'],
+			items: editor.config.get('icon.toolbarItems')!,
 			getRelatedElement: (selection) => {
 				const selectedElement = selection.getSelectedElement();
 				return selectedElement && selectedElement.is('element') && selectedElement.hasClass('ckeditor5-icons__widget') ? selectedElement : null;

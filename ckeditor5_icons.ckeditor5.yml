@@ -7,6 +7,10 @@ ckeditor5_icons_icon:
       - icon.Icon
     config:
       icon:
+        toolbarItems:
+          - iconSize
+          - iconAlignment
+          - iconStyle
         faVersion: '6'
         faStyles:
           - solid

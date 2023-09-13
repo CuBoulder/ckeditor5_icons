@@ -36,3 +36,13 @@ export default class DrupalAjaxProgressThrobberView extends View implements Focu
 		this.element?.focus();
 	}
 }
+
+declare global {
+	interface Window {
+		Drupal?: {
+			theme: {
+				ajaxProgressThrobber?: (message?: string) => string;
+			};
+		};
+	}
+}

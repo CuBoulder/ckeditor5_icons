@@ -3,6 +3,7 @@
  */
 
 import type { FontAwesomeVersion, FontAwesomeStyle, SelectableOption, CategoryDefinitions, IconName, IconDefinition, IconDefinitionAlt } from './icontypes';
+import type { ToolbarConfigItem } from 'ckeditor5/src/core';
 import { icons } from 'ckeditor5/src/core';
 import objectSizeExtraSmall from '../../../icons/object-size-extra-small.svg';
 
@@ -10,7 +11,8 @@ import objectSizeExtraSmall from '../../../icons/object-size-extra-small.svg';
  * The options available in `editor.config.get('icon')`.
  */
 export interface IconConfig {
-	faVersion?: FontAwesomeVersion;
+	toolbarItems: ToolbarConfigItem[];
+	faVersion: FontAwesomeVersion;
 	faCategories?: CategoryDefinitions;
 	faStyles?: FontAwesomeStyle[];
 	faIcons?: Record<IconName, IconDefinition | IconDefinitionAlt>;

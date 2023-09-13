@@ -14,16 +14,3 @@ declare module '@ckeditor/ckeditor5-core' {
 		alignIcon: ModifyIconCommand<Alignment, AlignmentAttributeDefinition>;
 	}
 }
-
-
-// Drupal-specific methods can be called at runtime (use sparingly).
-
-declare global {
-	interface Window {
-		Drupal?: {
-			theme: {
-				ajaxProgressThrobber?: (message?: string) => string;
-			};
-		};
-	}
-}
